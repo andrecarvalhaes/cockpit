@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
+import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 
-interface MainLayoutProps {
-  children: React.ReactNode;
-}
-
-export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+export const MainLayout: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
@@ -16,7 +13,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           isCollapsed ? 'ml-20' : 'ml-[250px]'
         }`}
       >
-        {children}
+        <Outlet />
       </main>
     </div>
   );

@@ -1,4 +1,5 @@
 import React from 'react';
+import { AuthProvider } from './AuthContext';
 import { TeamsProvider } from './TeamsContext';
 import { MetricsProvider } from './MetricsContext';
 import { ActionPlansProvider } from './ActionPlansContext';
@@ -11,16 +12,18 @@ interface AppProvidersProps {
 
 export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
   return (
-    <TeamsProvider>
-      <AreasProvider>
-        <MetricsProvider>
-          <ActionPlansProvider>
-            <RootCauseProvider>
-              {children}
-            </RootCauseProvider>
-          </ActionPlansProvider>
-        </MetricsProvider>
-      </AreasProvider>
-    </TeamsProvider>
+    <AuthProvider>
+      <TeamsProvider>
+        <AreasProvider>
+          <MetricsProvider>
+            <ActionPlansProvider>
+              <RootCauseProvider>
+                {children}
+              </RootCauseProvider>
+            </ActionPlansProvider>
+          </MetricsProvider>
+        </AreasProvider>
+      </TeamsProvider>
+    </AuthProvider>
   );
 };

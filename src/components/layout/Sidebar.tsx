@@ -11,10 +11,13 @@ import {
   ChevronUp,
   Plus,
   Users,
+  LogOut,
+  User as UserIcon,
 } from 'lucide-react';
 import { useAreas } from '../../hooks/useAreas';
 import { useTeams } from '../../hooks/useTeams';
 import { useMetrics } from '../../hooks/useMetrics';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -23,6 +26,7 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed }) => {
   const location = useLocation();
+  const { user, signOut } = useAuth();
   const { areas } = useAreas();
   const { teams } = useTeams();
   const { metrics } = useMetrics();
@@ -104,6 +108,40 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed })
             />
           )}
         </div>
+
+        {/* Menu de Usuário */}
+        {!isCollapsed && user && (
+          <div className="px-3 py-4 border-b border-border">
+            <div className="flex items-center gap-3 mb-3">
+              {user.user_metadata?.avatar_url ? (
+                <img
+                  src={user.user_metadata.avatar_url}
+                  alt="User"
+                  className="w-10 h-10 rounded-full"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                  <UserIcon size={20} className="text-white" />
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-text-primary truncate">
+                  {user.user_metadata?.full_name || user.email?.split('@')[0]}
+                </p>
+                <p className="text-xs text-text-secondary truncate">
+                  {user.email}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => signOut()}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-error hover:bg-red-50 transition-colors"
+            >
+              <LogOut size={16} />
+              Sair
+            </button>
+          </div>
+        )}
 
         {/* Menu Items */}
         <nav className="flex-1 px-3 py-6 space-y-2">
