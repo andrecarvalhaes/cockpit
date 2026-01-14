@@ -227,57 +227,59 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed })
           </Link>
         </nav>
 
-        {/* Rodapé - Voltar ao VendeMais, Menu de Usuário e Toggle */}
+        {/* Rodapé */}
         <div className="border-t border-border flex-shrink-0">
-          {/* Botão Voltar ao VendeMais */}
           {!isCollapsed && (
-            <a
-              href="https://vendemais.clubpetro.com/"
-              className="flex items-center gap-2 px-4 py-3 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-submenu transition-colors border-b border-border"
-            >
-              <ArrowLeft size={16} />
-              <span>Voltar ao VendeMais</span>
-            </a>
-          )}
-
-          {/* Menu de Usuário */}
-          {!isCollapsed && user && (
-            <div className="px-3 py-3 border-b border-border">
-              <div className="flex items-center gap-3 mb-2">
-                {user.user_metadata?.avatar_url ? (
-                  <img
-                    src={user.user_metadata.avatar_url}
-                    alt="User"
-                    className="w-10 h-10 rounded-full"
-                  />
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-                    <UserIcon size={20} className="text-white" />
+            <div className="p-4 space-y-3">
+              {/* Menu de Usuário */}
+              {user && (
+                <div className="bg-bg-secondary rounded-lg p-3">
+                  <div className="flex items-center gap-3 mb-3">
+                    {user.user_metadata?.avatar_url ? (
+                      <img
+                        src={user.user_metadata.avatar_url}
+                        alt="User"
+                        className="w-10 h-10 rounded-full"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                        <UserIcon size={20} className="text-white" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-text-primary truncate">
+                        {user.user_metadata?.full_name || user.email?.split('@')[0]}
+                      </p>
+                      <p className="text-xs text-text-secondary truncate">
+                        {user.email}
+                      </p>
+                    </div>
                   </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-text-primary truncate">
-                    {user.user_metadata?.full_name || user.email?.split('@')[0]}
-                  </p>
-                  <p className="text-xs text-text-secondary truncate">
-                    {user.email}
-                  </p>
+                  <button
+                    onClick={() => signOut()}
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm text-white bg-error hover:bg-red-600 transition-colors"
+                  >
+                    <LogOut size={16} />
+                    Sair
+                  </button>
                 </div>
-              </div>
-              <button
-                onClick={() => signOut()}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-error hover:bg-red-50 transition-colors"
+              )}
+
+              {/* Botão Voltar ao VendeMais */}
+              <a
+                href="https://vendemais.clubpetro.com/"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-text-secondary hover:text-primary hover:bg-bg-submenu rounded-lg transition-colors border border-border"
               >
-                <LogOut size={16} />
-                Sair
-              </button>
+                <ArrowLeft size={16} />
+                <span>Voltar ao VendeMais</span>
+              </a>
             </div>
           )}
 
           {/* Toggle Button */}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="flex items-center justify-center h-12 text-text-secondary hover:text-text-primary hover:bg-bg-submenu transition-colors"
+            className="flex items-center justify-center h-12 w-full border-t border-border text-text-secondary hover:text-text-primary hover:bg-bg-submenu transition-colors"
           >
             {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
           </button>
