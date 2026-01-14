@@ -48,14 +48,25 @@ export const MetricChart: React.FC<MetricChartProps> = ({ metric, height = 300, 
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
+      // Encontrar os dados de valor e meta
+      const valueData = payload.find((p: any) => p.dataKey === 'value');
+      const targetData = payload.find((p: any) => p.dataKey === 'target');
+
       return (
         <div className="bg-white p-3 rounded-lg border border-border shadow-card">
-          <p className="text-sm font-semibold text-text-primary">
+          <p className="text-sm font-semibold text-text-primary mb-2">
             {payload[0].payload.fullDate}
           </p>
-          <p className="text-sm text-text-secondary">
-            {formatMetricValue(payload[0].value, metric.unit)}
-          </p>
+          {valueData && (
+            <p className="text-sm text-text-primary font-medium">
+              Realizado: {formatMetricValue(valueData.value, metric.unit)}
+            </p>
+          )}
+          {targetData && (
+            <p className="text-xs text-text-secondary mt-1">
+              Meta: {formatMetricValue(targetData.value, metric.unit)}
+            </p>
+          )}
         </div>
       );
     }

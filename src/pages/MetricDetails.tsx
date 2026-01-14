@@ -91,7 +91,7 @@ export const MetricDetails: React.FC = () => {
         subtitle={metric.description}
         actions={
           <div className="flex gap-3">
-            <Button variant="secondary" onClick={() => navigate('/metrics')}>
+            <Button variant="secondary" onClick={() => navigate(-1)}>
               <ArrowLeft size={20} className="mr-2" />
               Voltar
             </Button>

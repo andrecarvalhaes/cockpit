@@ -6,6 +6,7 @@ interface MetricsContextType {
   metrics: Metric[];
   addMetric: (data: MetricFormData) => Promise<void>;
   updateMetric: (id: string, data: MetricFormData) => Promise<void>;
+  updateMetricOrder: (id: string, newOrder: number) => Promise<void>;
   deleteMetric: (id: string) => Promise<void>;
   addMetricValue: (metricId: string, data: MetricValueFormData) => Promise<void>;
   getMetricById: (id: string) => Metric | undefined;
@@ -186,6 +187,22 @@ export const MetricsProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
+  const updateMetricOrder = async (id: string, newOrder: number) => {
+    try {
+      const { error } = await supabase
+        .from('me_metrics')
+        .update({ display_order: newOrder })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      await refreshMetrics();
+    } catch (error) {
+      console.error('Error updating metric order:', error);
+      throw error;
+    }
+  };
+
   const deleteMetric = async (id: string) => {
     try {
       const { error } = await supabase
@@ -232,6 +249,7 @@ export const MetricsProvider: React.FC<{ children: React.ReactNode }> = ({ child
         metrics,
         addMetric,
         updateMetric,
+        updateMetricOrder,
         deleteMetric,
         addMetricValue,
         getMetricById,
