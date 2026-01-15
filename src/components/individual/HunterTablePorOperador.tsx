@@ -1,16 +1,19 @@
 import React from 'react';
+import { Maximize2 } from 'lucide-react';
 import { MetricasCalculadas } from '../../hooks/useLigacoesAgregadas';
 
 interface HunterTablePorOperadorProps {
   metricasPorOperador: Record<string, MetricasCalculadas>;
   selectedPhases: string[];
   heatMapEnabled: boolean;
+  onExpandOperador?: (operador: string) => void;
 }
 
 export const HunterTablePorOperador: React.FC<HunterTablePorOperadorProps> = ({
   metricasPorOperador,
   selectedPhases,
   heatMapEnabled,
+  onExpandOperador,
 }) => {
   const operadores = Object.keys(metricasPorOperador).sort();
 
@@ -114,7 +117,18 @@ export const HunterTablePorOperador: React.FC<HunterTablePorOperadorProps> = ({
                   key={operador}
                   className="px-6 py-4 text-center text-sm font-semibold text-text-primary whitespace-nowrap"
                 >
-                  {operador}
+                  <div className="flex items-center justify-center gap-2">
+                    <span>{operador}</span>
+                    {onExpandOperador && (
+                      <button
+                        onClick={() => onExpandOperador(operador)}
+                        className="p-1.5 rounded hover:bg-primary hover:bg-opacity-10 text-text-secondary hover:text-primary transition-all duration-200"
+                        title="Expandir detalhamento"
+                      >
+                        <Maximize2 size={14} />
+                      </button>
+                    )}
+                  </div>
                 </th>
               ))}
             </tr>

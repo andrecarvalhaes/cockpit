@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { HunterFilters, HunterFiltersState } from '../components/individual/HunterFilters';
 import { HunterTablePorOperador } from '../components/individual/HunterTablePorOperador';
+import { HunterTableExpandedOperador } from '../components/individual/HunterTableExpandedOperador';
 import { PhaseSelector } from '../components/individual/PhaseSelector';
 import { useLigacoesAgregadas, useOperadoresAgregados, useCampanhasAgregadas } from '../hooks/useLigacoesAgregadas';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
@@ -8,6 +9,7 @@ import { Flame } from 'lucide-react';
 
 export const Individual: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'hunter' | 'closer'>('hunter');
+  const [expandedOperador, setExpandedOperador] = useState<string | null>(null);
 
   // Período padrão: mês atual
   const defaultStartDate = format(startOfMonth(new Date()), 'yyyy-MM-dd');
@@ -144,13 +146,27 @@ export const Individual: React.FC = () => {
               </div>
             )}
 
-            {/* Tabela com operadores como colunas */}
+            {/* Tabela com operadores como colunas ou detalhamento expandido */}
             {!loading && (
-              <HunterTablePorOperador
-                metricasPorOperador={metricasPorOperador}
-                selectedPhases={selectedPhases}
-                heatMapEnabled={heatMapEnabled}
-              />
+              <>
+                {expandedOperador ? (
+                  <HunterTableExpandedOperador
+                    operador={expandedOperador}
+                    dateStart={appliedFilters.dateStart || defaultStartDate}
+                    dateEnd={appliedFilters.dateEnd || defaultEndDate}
+                    selectedPhases={selectedPhases}
+                    heatMapEnabled={heatMapEnabled}
+                    onClose={() => setExpandedOperador(null)}
+                  />
+                ) : (
+                  <HunterTablePorOperador
+                    metricasPorOperador={metricasPorOperador}
+                    selectedPhases={selectedPhases}
+                    heatMapEnabled={heatMapEnabled}
+                    onExpandOperador={setExpandedOperador}
+                  />
+                )}
+              </>
             )}
           </div>
         )}
