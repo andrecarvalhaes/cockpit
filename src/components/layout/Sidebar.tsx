@@ -11,14 +11,12 @@ import {
   ChevronUp,
   Plus,
   Users,
-  LogOut,
   User as UserIcon,
   ArrowLeft,
 } from 'lucide-react';
 import { useAreas } from '../../hooks/useAreas';
 import { useTeams } from '../../hooks/useTeams';
 import { useMetrics } from '../../hooks/useMetrics';
-import { useAuth } from '../../contexts/AuthContext';
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -27,7 +25,6 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed }) => {
   const location = useLocation();
-  const { user, signOut } = useAuth();
   const { areas } = useAreas();
   const { teams } = useTeams();
   const { metrics } = useMetrics();
@@ -246,41 +243,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed })
         {/* Rodapé */}
         <div className="border-t border-border flex-shrink-0">
           {!isCollapsed && (
-            <div className="p-4 space-y-3">
-              {/* Menu de Usuário */}
-              {user && (
-                <div className="bg-bg-secondary rounded-lg p-3">
-                  <div className="flex items-center gap-3 mb-3">
-                    {user.user_metadata?.avatar_url ? (
-                      <img
-                        src={user.user_metadata.avatar_url}
-                        alt="User"
-                        className="w-10 h-10 rounded-full"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-                        <UserIcon size={20} className="text-white" />
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-text-primary truncate">
-                        {user.user_metadata?.full_name || user.email?.split('@')[0]}
-                      </p>
-                      <p className="text-xs text-text-secondary truncate">
-                        {user.email}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => signOut()}
-                    className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm text-white bg-error hover:bg-red-600 transition-colors"
-                  >
-                    <LogOut size={16} />
-                    Sair
-                  </button>
-                </div>
-              )}
-
+            <div className="p-4">
               {/* Botão Voltar ao VendeMais */}
               <a
                 href="https://vendemais.clubpetro.com/"
