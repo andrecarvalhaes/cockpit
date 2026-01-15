@@ -14,6 +14,7 @@ import { ActionPlans } from './pages/ActionPlans';
 import { RootCauseAnalyses } from './pages/RootCauseAnalyses';
 import { RootCauseAnalysisDetail } from './pages/RootCauseAnalysisDetail';
 import { NewRootCauseAnalysis } from './pages/NewRootCauseAnalysis';
+import { Individual } from './pages/Individual';
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
             <Route path="root-cause-analyses" element={<RootCauseAnalyses />} />
             <Route path="root-cause-analyses/new" element={<NewRootCauseAnalysis />} />
             <Route path="root-cause-analyses/:id" element={<RootCauseAnalysisDetail />} />
+            <Route path="individual" element={<Individual />} />
           </Route>
         </Routes>
       </AppProviders>

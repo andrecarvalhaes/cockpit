@@ -48,6 +48,96 @@
     margin: 0;
   }
 
+  /* Date Range Picker Styles */
+  .date-range-picker-container {
+    @apply relative w-full;
+  }
+
+  .date-range-picker-input {
+    @apply w-full px-4 py-2 rounded-lg border border-border bg-white cursor-pointer flex items-center justify-between text-text-primary text-left transition-all duration-200 hover:border-neutral h-[42px];
+  }
+
+  .date-range-picker-popover {
+    @apply absolute top-full left-0 mt-2 z-50 bg-white border border-border rounded-lg shadow-lg;
+  }
+
+  .date-range-layout {
+    @apply flex;
+  }
+
+  .date-range-presets {
+    @apply w-44 p-2 border-r border-border;
+  }
+
+  .date-range-presets-list {
+    @apply list-none space-y-1;
+  }
+
+  .date-range-presets-list button {
+    @apply w-full px-3 py-2 text-left text-sm rounded hover:bg-bg-submenu transition-colors text-text-primary;
+  }
+
+  .date-range-calendar-section {
+    @apply p-4;
+  }
+
+  .date-range-calendar-header {
+    @apply flex justify-between items-center mb-4;
+  }
+
+  .date-range-calendar-header button {
+    @apply p-1 rounded hover:bg-bg-submenu transition-colors text-text-primary;
+  }
+
+  .date-range-calendars {
+    @apply flex gap-6;
+  }
+
+  .date-range-calendar {
+    @apply w-64;
+  }
+
+  .date-range-calendar-grid {
+    @apply grid grid-cols-7 gap-1;
+  }
+
+  .date-range-weekday {
+    @apply text-xs font-semibold text-text-secondary text-center p-2;
+  }
+
+  .date-range-day {
+    @apply w-9 h-9 flex items-center justify-center text-sm rounded-full hover:bg-bg-submenu transition-colors text-text-primary disabled:text-neutral disabled:cursor-not-allowed;
+  }
+
+  .date-range-day.other-month {
+    @apply text-neutral;
+  }
+
+  .date-range-day.in-range {
+    @apply bg-primary bg-opacity-10 rounded-none;
+  }
+
+  .date-range-day.selected-start,
+  .date-range-day.selected-end {
+    @apply bg-primary text-white;
+  }
+
+  .date-range-day.selected-start {
+    @apply rounded-r-none;
+  }
+
+  .date-range-day.selected-end {
+    @apply rounded-l-none;
+  }
+
+  .date-range-day.today {
+    @apply border border-primary;
+  }
+
+  .date-range-actions {
+    @apply flex justify-end gap-2 mt-4 pt-4 border-t border-border;
+  }
+
   input[type='number'] {
     -moz-appearance: textfield;
     appearance: textfield;

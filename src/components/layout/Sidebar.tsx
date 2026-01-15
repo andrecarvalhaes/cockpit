@@ -225,6 +225,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed })
               <span className="text-base font-medium">Análise de Causa Raiz</span>
             )}
           </Link>
+
+          {/* Individual */}
+          <Link
+            to="/individual"
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+              isActive('/individual')
+                ? 'bg-primary text-white'
+                : 'text-text-primary hover:bg-bg-submenu'
+            } ${isCollapsed ? 'justify-center' : ''}`}
+            title={isCollapsed ? 'Individual' : ''}
+          >
+            <UserIcon size={20} className="flex-shrink-0" />
+            {!isCollapsed && (
+              <span className="text-base font-medium">Individual</span>
+            )}
+          </Link>
         </nav>
 
         {/* Rodapé */}
