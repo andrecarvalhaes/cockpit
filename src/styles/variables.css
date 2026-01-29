@@ -1,0 +1,46 @@
+:root {
+  /* Cores primárias */
+  --primary-orange: #F26600;
+  --primary-orange-hover: #D95B00;
+
+  /* Cores de texto */
+  --text-primary: #1f2028;
+  --text-secondary: #1f2028;
+  --text-light: #FFFFFF;
+
+  /* Backgrounds */
+  --background-main: #FFFFFF;
+  --background-section: #F6F7F9;
+
+  /* Bordas e neutros */
+  --border-color: #E0E0E0;
+  --neutral-gray: #CCCCCC;
+  --disabled-color: #CCCCCC;
+
+  /* Status */
+  --green-check: #48C74C;
+  --green-check-hover: #3DAF41;
+  --red-cross: #DE5C40;
+  --status-yellow: #ecc94b;
+
+  /* Design Tokens */
+  --radius-4: 4px;
+  --radius-6: 6px;
+  --radius-8: 8px;
+  --radius-12: 12px;
+  --radius-pill: 20px;
+  --radius-full: 9999px;
+
+  --control-height: 42px;
+  --page-padding: 40px;
+  --card-padding: 24px;
+
+  /* Shadows */
+  --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --focus-ring: 0 0 0 3px rgba(242, 102, 0, 0.15);
+  --hover-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  /* Fontes */
+  --font-family-heading: 'Montserrat', sans-serif;
+  --font-family-body: 'Open Sans', sans-serif;
+}

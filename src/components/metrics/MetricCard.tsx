@@ -32,7 +32,12 @@ export const MetricCard: React.FC<MetricCardProps> = ({ metric }) => {
   };
 
   return (
-    <Card hoverable onClick={() => navigate(`/metrics/${metric.id}`)} className="relative cursor-pointer">
+    <Card
+      hoverable
+      elevate
+      onClick={() => navigate(`/metrics/${metric.id}`)}
+      className="relative cursor-pointer group"
+    >
       {isBelowTarget && (
         <div className="absolute top-4 right-4">
           <AlertCircle size={20} className="text-warning" />
@@ -57,7 +62,9 @@ export const MetricCard: React.FC<MetricCardProps> = ({ metric }) => {
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
-            {getTrendIcon()}
+            <div className="transition-transform duration-200 group-hover:scale-110">
+              {getTrendIcon()}
+            </div>
             <span className={`text-sm font-semibold ${getTrendColor()}`}>
               {Math.abs(variation).toFixed(1)}%
             </span>

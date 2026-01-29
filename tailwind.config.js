@@ -40,6 +40,36 @@ export default {
         'card': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
         'card-hover': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
       },
+      animation: {
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'fade-in': 'fadeIn 0.6s ease-out forwards',
+        'slide-in': 'slideInFromRight 0.4s ease-out',
+      },
+      keyframes: {
+        fadeIn: {
+          'from': {
+            opacity: '0',
+            transform: 'translateY(20px)',
+          },
+          'to': {
+            opacity: '1',
+            transform: 'translateY(0)',
+          },
+        },
+        slideInFromRight: {
+          'from': {
+            opacity: '0',
+            transform: 'translateX(20px)',
+          },
+          'to': {
+            opacity: '1',
+            transform: 'translateX(0)',
+          },
+        },
+      },
+      transitionDuration: {
+        '400': '400ms',
+      },
     },
   },
   plugins: [],
