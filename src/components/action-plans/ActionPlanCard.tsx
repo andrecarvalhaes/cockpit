@@ -44,9 +44,9 @@ export const ActionPlanCard: React.FC<ActionPlanCardProps> = ({ plan, onClick })
           )}
         </div>
 
-        {plan.metricName && (
+        {(plan.metricName || plan.area) && (
           <div className="text-xs text-primary font-medium bg-primary bg-opacity-10 px-3 py-1 rounded-full inline-block self-start ml-9">
-            Métrica: {plan.metricName}
+            {plan.metricName ? `Métrica: ${plan.metricName}` : `Área: ${plan.area}`}
           </div>
         )}
       </div>

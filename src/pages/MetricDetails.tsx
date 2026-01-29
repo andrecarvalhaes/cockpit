@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Trash2, Edit, TrendingUp, TrendingDown, Search } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Edit, TrendingUp, TrendingDown } from 'lucide-react';
 import { Header } from '../components/layout/Header';
 import { Button } from '../components/shared/Button';
 import { Card } from '../components/shared/Card';
@@ -98,10 +98,6 @@ export const MetricDetails: React.FC = () => {
             <Button variant="secondary" onClick={() => setIsEditModalOpen(true)}>
               <Edit size={20} className="mr-2" />
               Editar
-            </Button>
-            <Button variant="secondary" onClick={() => navigate(`/root-cause-analyses/new?metricId=${metric.id}`)}>
-              <Search size={20} className="mr-2" />
-              Analisar Causa Raiz
             </Button>
             <Button variant="danger" onClick={handleDeleteMetric}>
               <Trash2 size={20} className="mr-2" />

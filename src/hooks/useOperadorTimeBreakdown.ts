@@ -46,7 +46,7 @@ export const useOperadorTimeBreakdown = ({
         return days.map(day => ({
           start: startOfDay(day),
           end: endOfDay(day),
-          label: format(day, 'dd/MM', { locale: ptBR }),
+          label: `${format(day, 'dd/MM', { locale: ptBR })}\n${format(day, 'EEE', { locale: ptBR })}`,
         }));
       }
 
@@ -115,9 +115,13 @@ export const useOperadorTimeBreakdown = ({
     let query = supabase
       .from('mv_hunter_metrics')
       .select('*')
-      .eq('operador', operador)
       .gte('data_dia', startStr)
       .lte('data_dia', endStr);
+
+    // Se não for "Total", filtrar por operador específico
+    if (operador !== 'Total') {
+      query = query.eq('operador', operador);
+    }
 
     const { data, error: queryError } = await query;
 

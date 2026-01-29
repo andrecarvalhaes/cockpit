@@ -11,9 +11,6 @@ import { MetricsByArea } from './pages/MetricsByArea';
 import { MetricsByTeam } from './pages/MetricsByTeam';
 import { MetricsByTeamAndArea } from './pages/MetricsByTeamAndArea';
 import { ActionPlans } from './pages/ActionPlans';
-import { RootCauseAnalyses } from './pages/RootCauseAnalyses';
-import { RootCauseAnalysisDetail } from './pages/RootCauseAnalysisDetail';
-import { NewRootCauseAnalysis } from './pages/NewRootCauseAnalysis';
 import { Individual } from './pages/Individual';
 
 function App() {
@@ -40,9 +37,6 @@ function App() {
             <Route path="metrics/area/:area" element={<MetricsByArea />} />
             <Route path="metrics/:id" element={<MetricDetails />} />
             <Route path="action-plans" element={<ActionPlans />} />
-            <Route path="root-cause-analyses" element={<RootCauseAnalyses />} />
-            <Route path="root-cause-analyses/new" element={<NewRootCauseAnalysis />} />
-            <Route path="root-cause-analyses/:id" element={<RootCauseAnalysisDetail />} />
             <Route path="individual" element={<Individual />} />
           </Route>
         </Routes>

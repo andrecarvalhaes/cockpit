@@ -36,6 +36,8 @@ export const Individual: React.FC = () => {
     'Cards criados',
   ]);
   const [heatMapEnabled, setHeatMapEnabled] = useState(false);
+  const [hideWeekends, setHideWeekends] = useState(false);
+  const [hideZeroCalls, setHideZeroCalls] = useState(false);
 
   // Hooks de dados - usando view materializada
   const { operadores } = useOperadoresAgregados();
@@ -116,8 +118,8 @@ export const Individual: React.FC = () => {
                 />
               </div>
 
-              {/* Toggle Mapa de Calor */}
-              <div className="bg-white rounded-lg border border-border p-4 flex items-center">
+              {/* Toggle Mapa de Calor e Filtros */}
+              <div className="bg-white rounded-lg border border-border p-4 space-y-3">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <div className="relative">
                     <input
@@ -136,6 +138,40 @@ export const Individual: React.FC = () => {
                     </span>
                   </div>
                 </label>
+
+                <div className="border-t border-border pt-3 space-y-3">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <div className="relative">
+                      <input
+                        type="checkbox"
+                        checked={hideWeekends}
+                        onChange={(e) => setHideWeekends(e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-neutral rounded-full peer peer-checked:bg-primary transition-colors"></div>
+                      <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-5"></div>
+                    </div>
+                    <span className="text-sm font-medium text-text-primary whitespace-nowrap">
+                      Tirar final de semana
+                    </span>
+                  </label>
+
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <div className="relative">
+                      <input
+                        type="checkbox"
+                        checked={hideZeroCalls}
+                        onChange={(e) => setHideZeroCalls(e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-neutral rounded-full peer peer-checked:bg-primary transition-colors"></div>
+                      <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-5"></div>
+                    </div>
+                    <span className="text-sm font-medium text-text-primary whitespace-nowrap">
+                      Tirar zerados
+                    </span>
+                  </label>
+                </div>
               </div>
             </div>
 
@@ -157,6 +193,8 @@ export const Individual: React.FC = () => {
                     selectedPhases={selectedPhases}
                     heatMapEnabled={heatMapEnabled}
                     onClose={() => setExpandedOperador(null)}
+                    hideWeekends={hideWeekends}
+                    hideZeroCalls={hideZeroCalls}
                   />
                 ) : (
                   <HunterTablePorOperador

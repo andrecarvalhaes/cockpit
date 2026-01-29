@@ -8,8 +8,9 @@ export interface ActionPlan {
   id: string;
   title: string;
   description: string;
-  metricId: string;
-  metricName: string;
+  metricId?: string;
+  metricName?: string;
+  area?: string;
   responsible: string;
   expectedResult: string;
   completed: boolean;
@@ -21,7 +22,8 @@ export interface ActionPlan {
 export interface ActionPlanFormData {
   title: string;
   description: string;
-  metricId: string;
+  metricId?: string;
+  area?: string;
   responsible: string;
   expectedResult: string;
 }

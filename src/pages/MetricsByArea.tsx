@@ -62,8 +62,11 @@ export const MetricsByArea: React.FC = () => {
   const handleCreateActionPlan = (data: ActionPlanFormData) => {
     if (selectedMetric) {
       addActionPlan(data, selectedMetric.name);
-      setIsActionPlanModalOpen(false);
+    } else {
+      // Criando plano vinculado à área, não a uma métrica específica
+      addActionPlan({ ...data, area: area }, '');
     }
+    setIsActionPlanModalOpen(false);
   };
 
   return (
@@ -104,6 +107,16 @@ export const MetricsByArea: React.FC = () => {
             >
               <Presentation size={20} className="mr-2" />
               Apresentar
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setSelectedMetric(null);
+                setIsActionPlanModalOpen(true);
+              }}
+            >
+              <Plus size={20} className="mr-2" />
+              Novo Plano de Ação
             </Button>
             <Button variant="primary" onClick={() => setIsModalOpen(true)}>
               <Plus size={20} className="mr-2" />
@@ -178,20 +191,18 @@ export const MetricsByArea: React.FC = () => {
       )}
 
       {/* Modal de Plano de Ação */}
-      {selectedMetric && (
-        <Modal
-          isOpen={isActionPlanModalOpen}
-          onClose={() => setIsActionPlanModalOpen(false)}
-          title={`Criar Plano de Ação - ${selectedMetric.name}`}
-          size="lg"
-        >
-          <ActionPlanForm
-            onSubmit={handleCreateActionPlan}
-            onCancel={() => setIsActionPlanModalOpen(false)}
-            prefilledMetricId={selectedMetric.id}
-          />
-        </Modal>
-      )}
+      <Modal
+        isOpen={isActionPlanModalOpen}
+        onClose={() => setIsActionPlanModalOpen(false)}
+        title={selectedMetric ? `Criar Plano de Ação - ${selectedMetric.name}` : `Criar Plano de Ação - ${area}`}
+        size="lg"
+      >
+        <ActionPlanForm
+          onSubmit={handleCreateActionPlan}
+          onCancel={() => setIsActionPlanModalOpen(false)}
+          prefilledMetricId={selectedMetric?.id}
+        />
+      </Modal>
     </div>
   );
 };

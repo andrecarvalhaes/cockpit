@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Target } from 'lucide-react';
+import { Plus, Target, LayoutGrid, List, Trash2 } from 'lucide-react';
 import { Header } from '../components/layout/Header';
 import { Button } from '../components/shared/Button';
 import { Modal } from '../components/shared/Modal';
@@ -11,13 +11,14 @@ import { useMetrics } from '../hooks/useMetrics';
 import { ActionPlanFormData, ActionPlan } from '../types/actionPlan';
 
 export const ActionPlans: React.FC = () => {
-  const { actionPlans, addActionPlan, toggleComplete, addComment } = useActionPlans();
+  const { actionPlans, addActionPlan, toggleComplete, addComment, deleteActionPlan } = useActionPlans();
   const { getMetricById } = useMetrics();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedPlan, setSelectedPlan] = useState<ActionPlan | null>(null);
   const [newComment, setNewComment] = useState('');
+  const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards');
 
   const filteredPlans = actionPlans.filter((plan) => {
     if (selectedStatus === 'completed') return plan.completed;
@@ -32,7 +33,7 @@ export const ActionPlans: React.FC = () => {
   ];
 
   const handleCreateActionPlan = (data: ActionPlanFormData) => {
-    const metric = getMetricById(data.metricId);
+    const metric = data.metricId ? getMetricById(data.metricId) : null;
     addActionPlan(data, metric?.name || '');
     setIsModalOpen(false);
   };
@@ -78,7 +79,7 @@ export const ActionPlans: React.FC = () => {
 
       <div className="p-10">
         {/* Filtros */}
-        <div className="mb-6">
+        <div className="mb-6 flex items-center justify-between">
           <div className="w-48">
             <Select
               options={statusOptions}
@@ -86,11 +87,28 @@ export const ActionPlans: React.FC = () => {
               onChange={(e) => setSelectedStatus(e.target.value)}
             />
           </div>
+
+          <div className="flex gap-2">
+            <Button
+              variant={viewMode === 'cards' ? 'primary' : 'secondary'}
+              onClick={() => setViewMode('cards')}
+            >
+              <LayoutGrid size={20} className="mr-2" />
+              Cards
+            </Button>
+            <Button
+              variant={viewMode === 'list' ? 'primary' : 'secondary'}
+              onClick={() => setViewMode('list')}
+            >
+              <List size={20} className="mr-2" />
+              Lista
+            </Button>
+          </div>
         </div>
 
         {/* Lista de Planos */}
         {filteredPlans.length > 0 ? (
-          <ActionPlanList plans={filteredPlans} onPlanClick={handlePlanClick} />
+          <ActionPlanList plans={filteredPlans} onPlanClick={handlePlanClick} viewMode={viewMode} />
         ) : (
           <div className="text-center py-12">
             <Target size={64} className="mx-auto text-text-secondary mb-4" />
@@ -130,6 +148,18 @@ export const ActionPlans: React.FC = () => {
             <div className="flex items-center gap-4 w-full">
               <span className="flex-1">{selectedPlan.title}</span>
               <Button
+                variant="danger"
+                onClick={() => {
+                  if (window.confirm('Tem certeza que deseja excluir este plano de ação?')) {
+                    deleteActionPlan(selectedPlan.id);
+                    setSelectedPlan(null);
+                  }
+                }}
+              >
+                <Trash2 size={16} className="mr-2" />
+                Excluir
+              </Button>
+              <Button
                 variant={selectedPlan.completed ? 'secondary' : 'success'}
                 onClick={handleToggleComplete}
               >
@@ -163,13 +193,15 @@ export const ActionPlans: React.FC = () => {
                 <p className="text-text-primary">{selectedPlan.expectedResult}</p>
               </div>
 
-              {selectedPlan.metricName && (
+              {(selectedPlan.metricName || selectedPlan.area) && (
                 <div>
                   <p className="text-xs font-semibold text-text-secondary uppercase mb-2">
-                    Métrica Relacionada
+                    {selectedPlan.metricName ? 'Métrica Relacionada' : 'Área Relacionada'}
                   </p>
                   <div className="inline-block bg-primary bg-opacity-10 px-3 py-1 rounded-full">
-                    <p className="text-primary text-sm font-medium">{selectedPlan.metricName}</p>
+                    <p className="text-primary text-sm font-medium">
+                      {selectedPlan.metricName || selectedPlan.area}
+                    </p>
                   </div>
                 </div>
               )}

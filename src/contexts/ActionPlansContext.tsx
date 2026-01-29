@@ -10,6 +10,7 @@ interface ActionPlansContextType {
   toggleComplete: (id: string) => void;
   addComment: (id: string, content: string) => void;
   getActionPlansByMetric: (metricId: string) => ActionPlan[];
+  getActionPlansByArea: (area: string) => ActionPlan[];
 }
 
 export const ActionPlansContext = createContext<ActionPlansContextType | undefined>(undefined);
@@ -96,6 +97,10 @@ export const ActionPlansProvider: React.FC<{ children: React.ReactNode }> = ({ c
     return actionPlans.filter((plan) => plan.metricId === metricId);
   };
 
+  const getActionPlansByArea = (area: string) => {
+    return actionPlans.filter((plan) => plan.area === area);
+  };
+
   return (
     <ActionPlansContext.Provider
       value={{
@@ -106,6 +111,7 @@ export const ActionPlansProvider: React.FC<{ children: React.ReactNode }> = ({ c
         toggleComplete,
         addComment,
         getActionPlansByMetric,
+        getActionPlansByArea,
       }}
     >
       {children}

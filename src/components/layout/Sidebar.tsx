@@ -4,7 +4,6 @@ import {
   LayoutDashboard,
   TrendingUp,
   Target,
-  Search,
   ChevronLeft,
   ChevronRight,
   ChevronDown,
@@ -204,22 +203,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed })
             <Target size={20} className="flex-shrink-0" />
             {!isCollapsed && (
               <span className="text-base font-medium">Planos de Ação</span>
-            )}
-          </Link>
-
-          {/* Análise de Causa Raiz */}
-          <Link
-            to="/root-cause-analyses"
-            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-              isActive('/root-cause-analyses')
-                ? 'bg-primary text-white'
-                : 'text-text-primary hover:bg-bg-submenu'
-            } ${isCollapsed ? 'justify-center' : ''}`}
-            title={isCollapsed ? 'Análise de Causa Raiz' : ''}
-          >
-            <Search size={20} className="flex-shrink-0" />
-            {!isCollapsed && (
-              <span className="text-base font-medium">Análise de Causa Raiz</span>
             )}
           </Link>
 

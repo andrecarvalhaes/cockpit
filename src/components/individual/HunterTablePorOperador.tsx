@@ -17,6 +17,28 @@ export const HunterTablePorOperador: React.FC<HunterTablePorOperadorProps> = ({
 }) => {
   const operadores = Object.keys(metricasPorOperador).sort();
 
+  // Calcular totais somando todos os operadores
+  const getTotalMetrics = (): MetricasCalculadas => {
+    return operadores.reduce((acc, operador) => {
+      const metrics = metricasPorOperador[operador];
+      return {
+        ligacoes: acc.ligacoes + metrics.ligacoes,
+        tempoTotal: acc.tempoTotal + metrics.tempoTotal,
+        tempoFalada: acc.tempoFalada + metrics.tempoFalada,
+        tabulacoesPositivas: acc.tabulacoesPositivas + metrics.tabulacoesPositivas,
+        cardsCriados: acc.cardsCriados + metrics.cardsCriados,
+      };
+    }, {
+      ligacoes: 0,
+      tempoTotal: 0,
+      tempoFalada: 0,
+      tabulacoesPositivas: 0,
+      cardsCriados: 0,
+    });
+  };
+
+  const totalMetrics = getTotalMetrics();
+
   // Formatar tempo em horas:minutos
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -131,6 +153,20 @@ export const HunterTablePorOperador: React.FC<HunterTablePorOperadorProps> = ({
                   </div>
                 </th>
               ))}
+              <th className="px-6 py-4 text-center text-sm font-semibold text-text-primary whitespace-nowrap bg-primary bg-opacity-5">
+                <div className="flex items-center justify-center gap-2">
+                  <span>Total</span>
+                  {onExpandOperador && (
+                    <button
+                      onClick={() => onExpandOperador('Total')}
+                      className="p-1.5 rounded hover:bg-primary hover:bg-opacity-10 text-text-secondary hover:text-primary transition-all duration-200"
+                      title="Expandir detalhamento do total"
+                    >
+                      <Maximize2 size={14} />
+                    </button>
+                  )}
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -160,6 +196,9 @@ export const HunterTablePorOperador: React.FC<HunterTablePorOperadorProps> = ({
                       {formatValueByPhase(metricasPorOperador[operador], phase)}
                     </td>
                   ))}
+                  <td className="px-6 py-4 text-sm text-text-primary text-center font-bold bg-primary bg-opacity-5">
+                    {formatValueByPhase(totalMetrics, phase)}
+                  </td>
                 </tr>
               ))
             )}
