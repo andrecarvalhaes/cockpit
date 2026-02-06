@@ -221,14 +221,19 @@ export const MetricsProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const addMetricValue = async (metricId: string, data: MetricValueFormData) => {
     try {
+      // Usar upsert para inserir ou atualizar se já existir
+      // A constraint unique no banco garante que não haverá duplicatas
       const { error } = await supabase
         .from('me_metric_values')
-        .insert([{
+        .upsert([{
           metric_id: metricId,
           value: data.value,
           date: data.date.toISOString(),
           note: data.note,
-        }]);
+        }], {
+          onConflict: 'metric_id,date', // Conflict resolution baseado na constraint única
+          ignoreDuplicates: false, // Atualizar em caso de conflito
+        });
 
       if (error) throw error;
 
