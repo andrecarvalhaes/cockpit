@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { X, Calendar } from 'lucide-react';
+import { X, Calendar, TrendingUp } from 'lucide-react';
 import { useOperadorTimeBreakdown, TimeGranularity, TimePeriodMetrics, MetricasCalculadas } from '../../hooks/useOperadorTimeBreakdown';
 import { parseISO, isWeekend } from 'date-fns';
+import { MetricExpandedChart } from './MetricExpandedChart';
 
 interface HunterTableExpandedOperadorProps {
   operador: string;
@@ -32,6 +33,7 @@ export const HunterTableExpandedOperador: React.FC<HunterTableExpandedOperadorPr
   hideZeroCalls,
 }) => {
   const [granularity, setGranularity] = useState<TimeGranularity>('week');
+  const [expandedMetric, setExpandedMetric] = useState<string | null>(null);
 
   const { periodMetrics, loading } = useOperadorTimeBreakdown({
     operador,
@@ -230,7 +232,16 @@ export const HunterTableExpandedOperador: React.FC<HunterTableExpandedOperadorPr
                     className="hover:bg-bg-submenu transition-colors"
                   >
                     <td className="px-6 py-4 text-sm font-medium text-text-primary sticky left-0 bg-white hover:bg-bg-submenu z-10">
-                      {phase}
+                      <div className="flex items-center justify-between gap-3">
+                        <span>{phase}</span>
+                        <button
+                          onClick={() => setExpandedMetric(phase)}
+                          className="text-primary hover:text-primary-dark transition-colors p-1 hover:bg-primary hover:bg-opacity-10 rounded"
+                          title="Expandir gráfico"
+                        >
+                          <TrendingUp size={16} />
+                        </button>
+                      </div>
                     </td>
                     {filteredPeriodMetrics.map((pm, index) => (
                       <td
@@ -250,6 +261,46 @@ export const HunterTableExpandedOperador: React.FC<HunterTableExpandedOperadorPr
           </table>
         )}
       </div>
+
+      {/* Modal de gráfico expandido */}
+      {expandedMetric && (
+        <MetricExpandedChart
+          metricName={expandedMetric}
+          periodMetrics={filteredPeriodMetrics}
+          onClose={() => setExpandedMetric(null)}
+          formatValue={(value) => {
+            // Criar um objeto de métricas temporário apenas com o valor necessário
+            const tempMetrics: MetricasCalculadas = {
+              ligacoes: 0,
+              tempoTotal: 0,
+              tempoFalada: 0,
+              tabulacoesPositivas: 0,
+              cardsCriados: 0,
+            };
+
+            // Atribuir o valor ao campo correto baseado na métrica expandida
+            switch (expandedMetric) {
+              case 'Ligações':
+                tempMetrics.ligacoes = value;
+                break;
+              case 'Tempo total':
+                tempMetrics.tempoTotal = value;
+                break;
+              case 'Tempo falada':
+                tempMetrics.tempoFalada = value;
+                break;
+              case 'Tabulações Positivas':
+                tempMetrics.tabulacoesPositivas = value;
+                break;
+              case 'Cards criados':
+                tempMetrics.cardsCriados = value;
+                break;
+            }
+
+            return formatValueByPhase(tempMetrics, expandedMetric);
+          }}
+        />
+      )}
     </div>
   );
 };
