@@ -3,7 +3,7 @@ import { MarketingFilters, MarketingFiltersState } from '../components/individua
 import { MarketingMetricExpandedChart } from '../components/individual/MarketingMetricExpandedChart';
 import { useMarketingMetrics } from '../hooks/useMarketingMetrics';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
-import { Download, Users, UserCheck, Target, TrendingUp, TrendingDown, Maximize2, Minimize2 } from 'lucide-react';
+import { Download, Users, UserCheck, Target, TrendingUp, TrendingDown, Maximize2, Minimize2, CheckCircle, Calendar, Presentation, ShoppingCart, DollarSign } from 'lucide-react';
 
 type MetricType = 'downloads' | 'leads' | 'leadsQualificados' | 'mqls';
 
@@ -83,6 +83,70 @@ const MetricCard: React.FC<MetricCardProps> = ({
   );
 };
 
+// Componente de card simplificado (sem expansão)
+interface SimpleMetricCardProps {
+  title: string;
+  value: number;
+  icon: React.ReactNode;
+  previousValue?: number;
+  isComparison?: boolean;
+  isCurrency?: boolean;
+}
+
+const SimpleMetricCard: React.FC<SimpleMetricCardProps> = ({
+  title,
+  value,
+  icon,
+  previousValue,
+  isComparison = false,
+  isCurrency = false,
+}) => {
+  const calculateVariation = () => {
+    if (!isComparison || previousValue === undefined || previousValue === 0) return null;
+    const variation = ((value - previousValue) / previousValue) * 100;
+    return variation;
+  };
+
+  const variation = calculateVariation();
+
+  const formattedValue = isCurrency
+    ? `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    : value.toLocaleString('pt-BR');
+
+  return (
+    <div className="bg-white rounded-lg border border-border p-6 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <p className="text-sm font-medium text-text-secondary mb-1">{title}</p>
+          <p className="text-3xl font-bold text-text-primary">{formattedValue}</p>
+
+          {isComparison && previousValue !== undefined && (
+            <div className="mt-2 flex items-center gap-2">
+              <span className="text-xs text-text-secondary">
+                Anterior: {isCurrency
+                  ? `R$ ${previousValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                  : previousValue.toLocaleString('pt-BR')
+                }
+              </span>
+              {variation !== null && (
+                <div className={`flex items-center gap-1 ${variation >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {variation >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                  <span className="text-xs font-semibold">
+                    {Math.abs(variation).toFixed(1)}%
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        <div className="p-3 bg-primary bg-opacity-10 rounded-lg">
+          {icon}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const Marketing: React.FC = () => {
   // Período padrão: mês atual
   const defaultStartDate = format(startOfMonth(new Date()), 'yyyy-MM-dd');
@@ -154,44 +218,87 @@ export const Marketing: React.FC = () => {
 
       {/* Cards de Métricas */}
       {!loading && !error && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <MetricCard
-            title="Downloads"
-            value={currentMetrics.downloads}
-            previousValue={appliedFilters.compareWithPrevious && previousMetrics ? previousMetrics.downloads : undefined}
-            isComparison={appliedFilters.compareWithPrevious}
-            isExpanded={expandedMetric?.type === 'downloads'}
-            icon={<Download size={24} className="text-primary" />}
-            onExpand={() => setExpandedMetric(expandedMetric?.type === 'downloads' ? null : { type: 'downloads', title: 'Downloads' })}
-          />
-          <MetricCard
-            title="Leads"
-            value={currentMetrics.leads}
-            previousValue={appliedFilters.compareWithPrevious && previousMetrics ? previousMetrics.leads : undefined}
-            isComparison={appliedFilters.compareWithPrevious}
-            isExpanded={expandedMetric?.type === 'leads'}
-            icon={<Users size={24} className="text-primary" />}
-            onExpand={() => setExpandedMetric(expandedMetric?.type === 'leads' ? null : { type: 'leads', title: 'Leads' })}
-          />
-          <MetricCard
-            title="Leads Qualificados"
-            value={currentMetrics.leadsQualificados}
-            previousValue={appliedFilters.compareWithPrevious && previousMetrics ? previousMetrics.leadsQualificados : undefined}
-            isComparison={appliedFilters.compareWithPrevious}
-            isExpanded={expandedMetric?.type === 'leadsQualificados'}
-            icon={<UserCheck size={24} className="text-primary" />}
-            onExpand={() => setExpandedMetric(expandedMetric?.type === 'leadsQualificados' ? null : { type: 'leadsQualificados', title: 'Leads Qualificados' })}
-          />
-          <MetricCard
-            title="MQLs"
-            value={currentMetrics.mqls}
-            previousValue={appliedFilters.compareWithPrevious && previousMetrics ? previousMetrics.mqls : undefined}
-            isComparison={appliedFilters.compareWithPrevious}
-            isExpanded={expandedMetric?.type === 'mqls'}
-            icon={<Target size={24} className="text-primary" />}
-            onExpand={() => setExpandedMetric(expandedMetric?.type === 'mqls' ? null : { type: 'mqls', title: 'MQLs' })}
-          />
-        </div>
+        <>
+          {/* Primeira linha: 4 cards com expansão */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <MetricCard
+              title="Downloads"
+              value={currentMetrics.downloads}
+              previousValue={appliedFilters.compareWithPrevious && previousMetrics ? previousMetrics.downloads : undefined}
+              isComparison={appliedFilters.compareWithPrevious}
+              isExpanded={expandedMetric?.type === 'downloads'}
+              icon={<Download size={24} className="text-primary" />}
+              onExpand={() => setExpandedMetric(expandedMetric?.type === 'downloads' ? null : { type: 'downloads', title: 'Downloads' })}
+            />
+            <MetricCard
+              title="Leads"
+              value={currentMetrics.leads}
+              previousValue={appliedFilters.compareWithPrevious && previousMetrics ? previousMetrics.leads : undefined}
+              isComparison={appliedFilters.compareWithPrevious}
+              isExpanded={expandedMetric?.type === 'leads'}
+              icon={<Users size={24} className="text-primary" />}
+              onExpand={() => setExpandedMetric(expandedMetric?.type === 'leads' ? null : { type: 'leads', title: 'Leads' })}
+            />
+            <MetricCard
+              title="Leads Qualificados"
+              value={currentMetrics.leadsQualificados}
+              previousValue={appliedFilters.compareWithPrevious && previousMetrics ? previousMetrics.leadsQualificados : undefined}
+              isComparison={appliedFilters.compareWithPrevious}
+              isExpanded={expandedMetric?.type === 'leadsQualificados'}
+              icon={<UserCheck size={24} className="text-primary" />}
+              onExpand={() => setExpandedMetric(expandedMetric?.type === 'leadsQualificados' ? null : { type: 'leadsQualificados', title: 'Leads Qualificados' })}
+            />
+            <MetricCard
+              title="MQLs"
+              value={currentMetrics.mqls}
+              previousValue={appliedFilters.compareWithPrevious && previousMetrics ? previousMetrics.mqls : undefined}
+              isComparison={appliedFilters.compareWithPrevious}
+              isExpanded={expandedMetric?.type === 'mqls'}
+              icon={<Target size={24} className="text-primary" />}
+              onExpand={() => setExpandedMetric(expandedMetric?.type === 'mqls' ? null : { type: 'mqls', title: 'MQLs' })}
+            />
+          </div>
+
+          {/* Segunda linha: 5 novos cards simples */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            <SimpleMetricCard
+              title="SQLs"
+              value={currentMetrics.sqls}
+              previousValue={appliedFilters.compareWithPrevious && previousMetrics ? previousMetrics.sqls : undefined}
+              isComparison={appliedFilters.compareWithPrevious}
+              icon={<CheckCircle size={24} className="text-primary" />}
+            />
+            <SimpleMetricCard
+              title="Agenda"
+              value={currentMetrics.agenda}
+              previousValue={appliedFilters.compareWithPrevious && previousMetrics ? previousMetrics.agenda : undefined}
+              isComparison={appliedFilters.compareWithPrevious}
+              icon={<Calendar size={24} className="text-primary" />}
+            />
+            <SimpleMetricCard
+              title="Shows"
+              value={currentMetrics.shows}
+              previousValue={appliedFilters.compareWithPrevious && previousMetrics ? previousMetrics.shows : undefined}
+              isComparison={appliedFilters.compareWithPrevious}
+              icon={<Presentation size={24} className="text-primary" />}
+            />
+            <SimpleMetricCard
+              title="Venda"
+              value={currentMetrics.venda}
+              previousValue={appliedFilters.compareWithPrevious && previousMetrics ? previousMetrics.venda : undefined}
+              isComparison={appliedFilters.compareWithPrevious}
+              icon={<ShoppingCart size={24} className="text-primary" />}
+            />
+            <SimpleMetricCard
+              title="MRR"
+              value={currentMetrics.mrr}
+              previousValue={appliedFilters.compareWithPrevious && previousMetrics ? previousMetrics.mrr : undefined}
+              isComparison={appliedFilters.compareWithPrevious}
+              isCurrency={true}
+              icon={<DollarSign size={24} className="text-primary" />}
+            />
+          </div>
+        </>
       )}
 
       {/* Gráfico Expandido */}
