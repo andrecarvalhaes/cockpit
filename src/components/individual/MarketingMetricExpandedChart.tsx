@@ -3,7 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { X, ExternalLink } from 'lucide-react';
 import { useMarketingMetricsMonthly } from '../../hooks/useMarketingMetricsMonthly';
 
-type MetricType = 'downloads' | 'leads' | 'leadsQualificados' | 'mqls';
+type MetricType = 'downloads' | 'leads' | 'leadsQualificados' | 'mqls' | 'sqls' | 'agenda' | 'shows' | 'venda' | 'mrr';
 type ViewMode = 'general' | 'channel' | 'origin';
 
 interface MarketingMetricExpandedChartProps {
@@ -99,7 +99,9 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label, o
   const top10 = sortedData.slice(0, 10);
   const hasMore = sortedData.length > 10;
 
-  const handleViewAll = () => {
+  const handleViewAll = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     if (onViewAll) {
       const allData = sortedData.map(p => ({
         name: p.name || '',
@@ -130,13 +132,11 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label, o
         ))}
       </div>
       {hasMore && (
-        <button
-          onClick={handleViewAll}
-          className="mt-3 w-full flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary hover:bg-opacity-10 rounded transition-colors border border-primary"
-        >
-          <ExternalLink size={12} />
-          Ver todos ({sortedData.length})
-        </button>
+        <div className="mt-3 pt-3 border-t border-border">
+          <p className="text-xs text-text-secondary text-center">
+            <span className="font-medium text-primary">Clique na barra</span> para ver todos os {sortedData.length} itens
+          </p>
+        </div>
       )}
     </div>
   );
@@ -315,7 +315,30 @@ export const MarketingMetricExpandedChart: React.FC<MarketingMetricExpandedChart
                 />
               </BarChart>
             ) : (
-              <BarChart data={monthlyData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+              <BarChart
+                data={monthlyData}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                onClick={(data) => {
+                  if (data && data.activeLabel) {
+                    // Ao clicar na barra, abrir modal com todos os dados daquele mês
+                    const monthData = monthlyData.find(item => item.month === data.activeLabel);
+                    if (monthData) {
+                      const allData = uniqueKeys
+                        .map(key => ({
+                          name: key,
+                          value: (monthData[key] as number) || 0,
+                          color: colorMap[key],
+                        }))
+                        .filter(item => item.value > 0)
+                        .sort((a, b) => b.value - a.value);
+
+                      if (allData.length > 0) {
+                        handleViewAll(data.activeLabel, allData);
+                      }
+                    }
+                  }
+                }}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis
                   dataKey="month"
@@ -329,7 +352,7 @@ export const MarketingMetricExpandedChart: React.FC<MarketingMetricExpandedChart
                 />
                 <Tooltip
                   content={<CustomTooltip onViewAll={handleViewAll} colors={colorMap} />}
-                  cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
+                  cursor={{ fill: 'rgba(0, 0, 0, 0.05)', cursor: 'pointer' }}
                 />
                 {uniqueKeys.map((key) => (
                   <Bar
@@ -338,6 +361,7 @@ export const MarketingMetricExpandedChart: React.FC<MarketingMetricExpandedChart
                     stackId="a"
                     fill={colorMap[key]}
                     name={key}
+                    cursor="pointer"
                   />
                 ))}
               </BarChart>
