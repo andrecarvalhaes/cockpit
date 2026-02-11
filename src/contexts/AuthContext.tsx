@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import { usePermissions, UserPermissions } from '../hooks/usePermissions';
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  permissions: UserPermissions;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -24,6 +26,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const permissions = usePermissions(user);
 
   useEffect(() => {
     // Verificar sessão ativa ao carregar
@@ -69,6 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     session,
     loading,
+    permissions,
     signInWithGoogle,
     signOut,
   };
