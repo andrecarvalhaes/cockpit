@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, X } from 'lucide-react';
+import { ChevronDown, X, Search } from 'lucide-react';
 
 interface MultiSelectProps {
   label?: string;
@@ -17,7 +17,9 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
   placeholder = 'Selecione...',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchText, setSearchText] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -29,6 +31,15 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (isOpen && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+    if (!isOpen) {
+      setSearchText('');
+    }
+  }, [isOpen]);
 
   const toggleOption = (optionValue: string) => {
     if (value.includes(optionValue)) {
@@ -48,6 +59,12 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
       .map(v => options.find(o => o.value === v)?.label)
       .filter(Boolean);
   };
+
+  // Filtrar opções baseadas no texto de busca
+  const filteredOptions = options.filter(option =>
+    option.label.toLowerCase().includes(searchText.toLowerCase()) ||
+    option.value.toLowerCase().includes(searchText.toLowerCase())
+  );
 
   return (
     <div className="flex flex-col gap-1" ref={containerRef}>
@@ -81,25 +98,50 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
         </button>
 
         {isOpen && (
-          <div className="absolute z-50 w-full mt-1 bg-white border border-border rounded-lg shadow-lg max-h-60 overflow-auto">
-            {options.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => toggleOption(option.value)}
-                className={`w-full px-4 py-2 text-left hover:bg-bg-submenu transition-colors flex items-center gap-2 ${
-                  value.includes(option.value) ? 'bg-primary bg-opacity-5' : ''
-                }`}
-              >
+          <div className="absolute z-50 w-full mt-1 bg-white border border-border rounded-lg shadow-lg overflow-hidden">
+            {/* Campo de busca */}
+            <div className="p-2 border-b border-border bg-bg-submenu">
+              <div className="relative">
+                <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary" />
                 <input
-                  type="checkbox"
-                  checked={value.includes(option.value)}
-                  onChange={() => {}}
-                  className="rounded border-border text-primary focus:ring-primary"
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  placeholder="Buscar..."
+                  className="w-full pl-9 pr-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  onClick={(e) => e.stopPropagation()}
                 />
-                <span className="text-sm text-text-primary">{option.label}</span>
-              </button>
-            ))}
+              </div>
+            </div>
+
+            {/* Lista de opções */}
+            <div className="max-h-60 overflow-auto">
+              {filteredOptions.length > 0 ? (
+                filteredOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => toggleOption(option.value)}
+                    className={`w-full px-4 py-2 text-left hover:bg-bg-submenu transition-colors flex items-center gap-2 ${
+                      value.includes(option.value) ? 'bg-primary bg-opacity-5' : ''
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={value.includes(option.value)}
+                      onChange={() => {}}
+                      className="rounded border-border text-primary focus:ring-primary"
+                    />
+                    <span className="text-sm text-text-primary">{option.label}</span>
+                  </button>
+                ))
+              ) : (
+                <div className="px-4 py-3 text-sm text-text-secondary text-center">
+                  Nenhum resultado encontrado
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
