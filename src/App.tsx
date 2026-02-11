@@ -12,6 +12,7 @@ import { MetricsByTeam } from './pages/MetricsByTeam';
 import { MetricsByTeamAndArea } from './pages/MetricsByTeamAndArea';
 import { ActionPlans } from './pages/ActionPlans';
 import { Individual } from './pages/Individual';
+import { Design } from './pages/Design';
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
             <Route path="metrics/:id" element={<MetricDetails />} />
             <Route path="action-plans" element={<ActionPlans />} />
             <Route path="individual" element={<Individual />} />
+            <Route path="design" element={<Design />} />
           </Route>
         </Routes>
       </AppProviders>

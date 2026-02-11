@@ -3,7 +3,7 @@ import { HunterFilters, HunterFiltersState } from '../components/individual/Hunt
 import { HunterTablePorOperador } from '../components/individual/HunterTablePorOperador';
 import { HunterTableExpandedOperador } from '../components/individual/HunterTableExpandedOperador';
 import { PhaseSelector } from '../components/individual/PhaseSelector';
-import { useLigacoesAgregadas, useOperadoresAgregados, useCampanhasAgregadas } from '../hooks/useLigacoesAgregadas';
+import { useLigacoesAgregadas, useOperadoresAgregados } from '../hooks/useLigacoesAgregadas';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { Flame } from 'lucide-react';
 
@@ -18,13 +18,11 @@ export const Individual: React.FC = () => {
   // Estados para Hunter
   const [filters, setFilters] = useState<HunterFiltersState>({
     operadores: [],
-    campanhas: [],
     dateStart: defaultStartDate,
     dateEnd: defaultEndDate,
   });
   const [appliedFilters, setAppliedFilters] = useState<HunterFiltersState>({
     operadores: [],
-    campanhas: [],
     dateStart: defaultStartDate,
     dateEnd: defaultEndDate,
   });
@@ -41,15 +39,12 @@ export const Individual: React.FC = () => {
 
   // Hooks de dados - usando view materializada
   const { operadores } = useOperadoresAgregados();
-  const { campanhas } = useCampanhasAgregadas();
   const { metricas, metricasPorOperador, loading } = useLigacoesAgregadas(
     appliedFilters.operadores.length > 0 ||
-    appliedFilters.campanhas.length > 0 ||
     appliedFilters.dateStart ||
     appliedFilters.dateEnd
       ? {
           operadores: appliedFilters.operadores.length > 0 ? appliedFilters.operadores : undefined,
-          campanhas: appliedFilters.campanhas.length > 0 ? appliedFilters.campanhas : undefined,
           dateStart: appliedFilters.dateStart || undefined,
           dateEnd: appliedFilters.dateEnd || undefined,
         }
@@ -106,7 +101,6 @@ export const Individual: React.FC = () => {
               onFiltersChange={setFilters}
               onApplyFilters={handleApplyFilters}
               operadores={operadores}
-              campanhas={campanhas}
             />
 
             {/* Seletor de Fases e Mapa de Calor */}

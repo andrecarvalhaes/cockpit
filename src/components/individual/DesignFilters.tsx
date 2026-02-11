@@ -1,28 +1,28 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { MultiSelect } from '../shared/MultiSelect';
 import { DateRangePicker } from '../shared/DateRangePicker';
 import { Search } from 'lucide-react';
 
-export interface HunterFiltersState {
+export interface DesignFiltersState {
   operadores: string[];
   dateStart: string;
   dateEnd: string;
 }
 
-interface HunterFiltersProps {
-  filters: HunterFiltersState;
-  onFiltersChange: (filters: HunterFiltersState) => void;
+interface DesignFiltersProps {
+  filters: DesignFiltersState;
+  onFiltersChange: (filters: DesignFiltersState) => void;
   onApplyFilters: () => void;
   operadores: string[];
 }
 
-export const HunterFilters: React.FC<HunterFiltersProps> = ({
+export const DesignFilters: React.FC<DesignFiltersProps> = ({
   filters,
   onFiltersChange,
   onApplyFilters,
   operadores,
 }) => {
-  const updateFilter = (key: keyof HunterFiltersState, value: string[] | string) => {
+  const updateFilter = (key: keyof DesignFiltersState, value: string[] | string) => {
     onFiltersChange({
       ...filters,
       [key]: value,

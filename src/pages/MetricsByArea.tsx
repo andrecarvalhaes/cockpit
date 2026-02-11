@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Plus, Presentation, LayoutGrid, List } from 'lucide-react';
+import { Plus, Users, LayoutGrid, List, StickyNote } from 'lucide-react';
 import { Header } from '../components/layout/Header';
 import { Button } from '../components/shared/Button';
 import { MetricCard } from '../components/metrics/MetricCard';
@@ -9,6 +9,8 @@ import { Modal } from '../components/shared/Modal';
 import { MetricForm } from '../components/metrics/MetricForm';
 import { PresentationMode } from '../components/metrics/PresentationMode';
 import { CommentModal } from '../components/metrics/CommentModal';
+import { AnalysisNotesModal } from '../components/metrics/AnalysisNotesModal';
+import { WarRoomModal } from '../components/metrics/WarRoomModal';
 import { ActionPlanForm } from '../components/action-plans/ActionPlanForm';
 import { useMetrics } from '../hooks/useMetrics';
 import { useActionPlans } from '../hooks/useActionPlans';
@@ -22,9 +24,10 @@ export const MetricsByArea: React.FC = () => {
   const { addActionPlan } = useActionPlans();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isPresentationMode, setIsPresentationMode] = useState(false);
   const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
   const [isActionPlanModalOpen, setIsActionPlanModalOpen] = useState(false);
+  const [isAnalysisNotesModalOpen, setIsAnalysisNotesModalOpen] = useState(false);
+  const [isWarRoomModalOpen, setIsWarRoomModalOpen] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState<Metric | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
 
@@ -102,11 +105,17 @@ export const MetricsByArea: React.FC = () => {
             </div>
             <Button
               variant="secondary"
-              onClick={() => setIsPresentationMode(true)}
-              disabled={filteredMetrics.length === 0}
+              onClick={() => setIsAnalysisNotesModalOpen(true)}
             >
-              <Presentation size={20} className="mr-2" />
-              Apresentar
+              <StickyNote size={20} className="mr-2" />
+              Notas
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => setIsWarRoomModalOpen(true)}
+            >
+              <Users size={20} className="mr-2" />
+              War Room
             </Button>
             <Button
               variant="secondary"
@@ -170,16 +179,6 @@ export const MetricsByArea: React.FC = () => {
         />
       </Modal>
 
-      {/* Modo Apresentação */}
-      {isPresentationMode && (
-        <PresentationMode
-          metrics={filteredMetrics}
-          onClose={() => setIsPresentationMode(false)}
-          onOpenComment={handleOpenComment}
-          onOpenActionPlan={handleOpenActionPlan}
-        />
-      )}
-
       {/* Modal de Comentário */}
       {selectedMetric && (
         <CommentModal
@@ -203,6 +202,20 @@ export const MetricsByArea: React.FC = () => {
           prefilledMetricId={selectedMetric?.id}
         />
       </Modal>
+
+      {/* Modal de Notas de Análise */}
+      <AnalysisNotesModal
+        isOpen={isAnalysisNotesModalOpen}
+        onClose={() => setIsAnalysisNotesModalOpen(false)}
+        area={area || ''}
+      />
+
+      {/* Modal de War Room */}
+      <WarRoomModal
+        isOpen={isWarRoomModalOpen}
+        onClose={() => setIsWarRoomModalOpen(false)}
+        area={area || ''}
+      />
     </div>
   );
 };

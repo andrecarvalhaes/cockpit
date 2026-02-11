@@ -12,6 +12,7 @@ import {
   Users,
   User as UserIcon,
   ArrowLeft,
+  Lock,
 } from 'lucide-react';
 import { useAreas } from '../../hooks/useAreas';
 import { useTeams } from '../../hooks/useTeams';
@@ -29,6 +30,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed })
   const { metrics } = useMetrics();
   const [isMetricsExpanded, setIsMetricsExpanded] = useState(false);
   const [isTeamsExpanded, setIsTeamsExpanded] = useState(false);
+  const [isPerformanceExpanded, setIsPerformanceExpanded] = useState(false);
   const [isAddingArea, setIsAddingArea] = useState(false);
   const [newAreaName, setNewAreaName] = useState('');
   const [expandedTeam, setExpandedTeam] = useState<string | null>(null);
@@ -206,21 +208,65 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed })
             )}
           </Link>
 
-          {/* Individual */}
-          <Link
-            to="/individual"
-            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-              isActive('/individual')
-                ? 'bg-primary text-white'
-                : 'text-text-primary hover:bg-bg-submenu'
-            } ${isCollapsed ? 'justify-center' : ''}`}
-            title={isCollapsed ? 'Individual' : ''}
-          >
-            <UserIcon size={20} className="flex-shrink-0" />
-            {!isCollapsed && (
-              <span className="text-base font-medium">Individual</span>
+          {/* Performance */}
+          <div>
+            <button
+              onClick={() => !isCollapsed && setIsPerformanceExpanded(!isPerformanceExpanded)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                location.pathname.startsWith('/individual') || location.pathname.startsWith('/design')
+                  ? 'bg-primary text-white'
+                  : 'text-text-primary hover:bg-bg-submenu'
+              } ${isCollapsed ? 'justify-center' : ''}`}
+              title={isCollapsed ? 'Performance' : ''}
+            >
+              <UserIcon size={20} className="flex-shrink-0" />
+              {!isCollapsed && (
+                <>
+                  <span className="text-base font-medium flex-1 text-left">Performance</span>
+                  {isPerformanceExpanded ? (
+                    <ChevronUp size={16} />
+                  ) : (
+                    <ChevronDown size={16} />
+                  )}
+                </>
+              )}
+            </button>
+
+            {/* Submenus de Performance */}
+            {!isCollapsed && isPerformanceExpanded && (
+              <div className="mt-2 ml-4 space-y-1 border-l-2 border-border pl-2">
+                {/* Hunter - Ativo */}
+                <Link
+                  to="/individual"
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-all duration-200 ${
+                    location.pathname === '/individual'
+                      ? 'text-primary font-semibold bg-primary bg-opacity-10'
+                      : 'text-text-secondary hover:text-text-primary hover:bg-bg-submenu'
+                  }`}
+                >
+                  <span>Hunter</span>
+                </Link>
+
+                {/* Closer - Trancado */}
+                <div className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-text-secondary opacity-50 cursor-not-allowed">
+                  <span>Closer</span>
+                  <Lock size={12} className="ml-auto" />
+                </div>
+
+                {/* Design - Ativo */}
+                <Link
+                  to="/design"
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-all duration-200 ${
+                    location.pathname === '/design'
+                      ? 'text-primary font-semibold bg-primary bg-opacity-10'
+                      : 'text-text-secondary hover:text-text-primary hover:bg-bg-submenu'
+                  }`}
+                >
+                  <span>Design</span>
+                </Link>
+              </div>
             )}
-          </Link>
+          </div>
         </nav>
 
         {/* Rodapé */}
