@@ -207,6 +207,10 @@ async function fetchKommoMetrics(
     const startFormatted = `${dayStart}.${monthStart}.${yearStart}`;
     const endFormatted = `${dayEnd}.${monthEnd}.${yearEnd}`;
 
+    console.log('🔍 Kommo Metrics - Período solicitado:');
+    console.log('   Start:', dateStart, '→', startFormatted);
+    console.log('   End:', dateEnd, '→', endFormatted);
+
     // Buscar todos os dados de aux_kommo com filtro de Origem = Inbound
     const { data: allData, error } = await supabase
       .from('aux_kommo')
@@ -214,6 +218,8 @@ async function fetchKommoMetrics(
       .eq('Origem', 'Inbound');
 
     if (error) throw error;
+
+    console.log('📊 Total de registros Inbound:', allData?.length || 0);
 
     if (!allData) {
       return { sqls: 0, agenda: 0, shows: 0, venda: 0, mrr: 0 };
@@ -226,9 +232,15 @@ async function fetchKommoMetrics(
       // Extrair apenas a parte da data (DD.MM.YYYY)
       const datePart = item['Criado em'].split(' ')[0];
 
-      // Comparar strings no formato DD.MM.YYYY
-      return datePart >= startFormatted && datePart <= endFormatted;
+      // Converter DD.MM.YYYY para YYYY-MM-DD para comparação correta
+      const [day, month, year] = datePart.split('.');
+      const dateFormatted = `${year}-${month}-${day}`;
+
+      // Comparar datas no formato YYYY-MM-DD
+      return dateFormatted >= dateStart && dateFormatted <= dateEnd;
     });
+
+    console.log('📅 Registros no período:', filteredData.length);
 
     // Para "Venda ganha", agrupar por Program_ID (contar apenas 1 por Program_ID diferente)
     const vendaGanhaData = filteredData.filter(item => item['Etapa do lead'] === 'Venda ganha');
@@ -239,6 +251,9 @@ async function fetchKommoMetrics(
     // Dados que não são "Venda ganha"
     const outrosData = filteredData.filter(item => item['Etapa do lead'] !== 'Venda ganha');
 
+    console.log('🏆 Venda Ganha:', vendaGanhaData.length, 'registros, Program_IDs únicos:', vendaGanhaProgramIds.size);
+    console.log('📌 Outros:', outrosData.length, 'registros');
+
     // 1. SQLs: É posto? = Sim
     const sqlsVendaGanha = vendaGanhaProgramIds.size > 0
       ? Array.from(vendaGanhaProgramIds).filter(programId => {
@@ -248,6 +263,11 @@ async function fetchKommoMetrics(
       : 0;
     const sqlsOutros = outrosData.filter(item => item['É posto?'] === 'Sim').length;
     const sqls = sqlsVendaGanha + sqlsOutros;
+
+    console.log('📋 SQLs:');
+    console.log('   Venda Ganha (Program_IDs únicos com "É posto?" = Sim):', sqlsVendaGanha);
+    console.log('   Outros (registros com "É posto?" = Sim):', sqlsOutros);
+    console.log('   Total SQLs:', sqls);
 
     // 2. Agenda: Data da Apresentação preenchido
     const agendaVendaGanha = vendaGanhaProgramIds.size > 0
@@ -311,6 +331,13 @@ async function fetchKommoMetrics(
       const valorNumerico = parseFloat(valorLimpo);
       return sum + (isNaN(valorNumerico) ? 0 : valorNumerico);
     }, 0);
+
+    console.log('📊 Resumo Final:');
+    console.log('   SQLs:', sqls);
+    console.log('   Agenda:', agenda);
+    console.log('   Shows:', shows);
+    console.log('   Venda:', venda);
+    console.log('   MRR: R$', Math.round(mrr));
 
     return {
       sqls,
