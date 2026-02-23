@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, TooltipProps } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, TooltipProps, ReferenceLine } from 'recharts';
 import { X, ExternalLink } from 'lucide-react';
 import { useMarketingMetricsMonthly } from '../../hooks/useMarketingMetricsMonthly';
 
@@ -12,6 +12,7 @@ interface MarketingMetricExpandedChartProps {
   onClose: () => void;
   channels?: string[];
   origins?: string[];
+  monthlyGoal?: number;
 }
 
 // Cores para os canais/origens (paleta variada mas harmoniosa)
@@ -148,6 +149,7 @@ export const MarketingMetricExpandedChart: React.FC<MarketingMetricExpandedChart
   onClose,
   channels = [],
   origins = [],
+  monthlyGoal,
 }) => {
   const [viewMode, setViewMode] = useState<ViewMode>('general');
   const [detailsModal, setDetailsModal] = useState<{
@@ -298,6 +300,21 @@ export const MarketingMetricExpandedChart: React.FC<MarketingMetricExpandedChart
                   labelStyle={{ color: '#111827', fontWeight: 600 }}
                   itemStyle={{ color: '#F26600' }}
                 />
+                {monthlyGoal !== undefined && (
+                  <ReferenceLine
+                    y={monthlyGoal}
+                    stroke="#10b981"
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                    label={{
+                      value: `Meta: ${monthlyGoal.toLocaleString('pt-BR')}`,
+                      position: 'right',
+                      fill: '#10b981',
+                      fontSize: 12,
+                      fontWeight: 600,
+                    }}
+                  />
+                )}
                 <Bar
                   dataKey="value"
                   stackId="a"
@@ -354,6 +371,21 @@ export const MarketingMetricExpandedChart: React.FC<MarketingMetricExpandedChart
                   content={<CustomTooltip onViewAll={handleViewAll} colors={colorMap} />}
                   cursor={{ fill: 'rgba(0, 0, 0, 0.05)', cursor: 'pointer' }}
                 />
+                {monthlyGoal !== undefined && (
+                  <ReferenceLine
+                    y={monthlyGoal}
+                    stroke="#10b981"
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                    label={{
+                      value: `Meta: ${monthlyGoal.toLocaleString('pt-BR')}`,
+                      position: 'right',
+                      fill: '#10b981',
+                      fontSize: 12,
+                      fontWeight: 600,
+                    }}
+                  />
+                )}
                 {uniqueKeys.map((key) => (
                   <Bar
                     key={key}

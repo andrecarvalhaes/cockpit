@@ -11,12 +11,27 @@ import { Download, Users, UserCheck, Target, TrendingUp, TrendingDown, Maximize2
 
 type MetricType = 'downloads' | 'leads' | 'leadsQualificados' | 'mqls' | 'sqls' | 'agenda' | 'shows' | 'venda' | 'mrr';
 
+// Metas mensais de marketing
+const MONTHLY_GOALS = {
+  downloads: 1214,
+  leads: 911,
+  leadsQualificados: 729,
+  mqls: 155,
+  sqls: 125,
+  agenda: 50,
+  shows: 40,
+  venda: 14,
+  mrr: 15000,
+};
+
 interface MetricCardProps {
   title: string;
   value: number;
   icon: React.ReactNode;
   previousValue?: number;
+  targetValue?: number;
   isComparison?: boolean;
+  isCompareWithGoal?: boolean;
   isExpanded?: boolean;
   onExpand?: () => void;
   isCurrency?: boolean;
@@ -27,12 +42,19 @@ const MetricCard: React.FC<MetricCardProps> = ({
   value,
   icon,
   previousValue,
+  targetValue,
   isComparison = false,
+  isCompareWithGoal = false,
   isExpanded = false,
   onExpand,
   isCurrency = false,
 }) => {
   const calculateVariation = () => {
+    if (isCompareWithGoal && targetValue !== undefined && targetValue !== 0) {
+      // Calcular % que falta para atingir a meta
+      const percentageToGoal = ((value - targetValue) / targetValue) * 100;
+      return percentageToGoal;
+    }
     if (!isComparison || previousValue === undefined || previousValue === 0) return null;
     const variation = ((value - previousValue) / previousValue) * 100;
     return variation;
@@ -64,7 +86,25 @@ const MetricCard: React.FC<MetricCardProps> = ({
           {formattedValue}
         </p>
 
-        {isComparison && previousValue !== undefined && (
+        {isCompareWithGoal && targetValue !== undefined && (
+          <div className="mt-2 flex flex-col items-center gap-1">
+            <span className="text-xs text-text-secondary">
+              Meta: {isCurrency
+                ? `R$ ${targetValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                : targetValue.toLocaleString('pt-BR')}
+            </span>
+            {variation !== null && (
+              <div className={`flex items-center gap-1 ${variation >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {variation >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                <span className="text-xs font-semibold">
+                  {variation >= 0 ? '+' : ''}{Math.abs(variation).toFixed(1)}%
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {isComparison && !isCompareWithGoal && previousValue !== undefined && (
           <div className="mt-2 flex flex-col items-center gap-1">
             <span className="text-xs text-text-secondary">
               Anterior: {formattedPreviousValue}
@@ -115,6 +155,7 @@ export const Marketing: React.FC = () => {
     dateStart: defaultStartDate,
     dateEnd: defaultEndDate,
     compareWithPrevious: false,
+    compareWithGoal: false,
     channels: [],
     origins: [],
   });
@@ -123,9 +164,39 @@ export const Marketing: React.FC = () => {
     dateStart: defaultStartDate,
     dateEnd: defaultEndDate,
     compareWithPrevious: false,
+    compareWithGoal: false,
     channels: [],
     origins: [],
   });
+
+  // Calcular metas proporcionais baseado no período filtrado
+  const calculateProportionalGoals = () => {
+    const start = new Date(appliedFilters.dateStart);
+    const end = new Date(appliedFilters.dateEnd);
+
+    // Calcular número de dias no período
+    const daysInPeriod = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+
+    // Calcular dias médios em um mês (30.44 dias = 365.25 / 12)
+    const averageDaysInMonth = 30.44;
+
+    // Fator de proporcionalidade
+    const proportionFactor = daysInPeriod / averageDaysInMonth;
+
+    return {
+      downloads: Math.round(MONTHLY_GOALS.downloads * proportionFactor),
+      leads: Math.round(MONTHLY_GOALS.leads * proportionFactor),
+      leadsQualificados: Math.round(MONTHLY_GOALS.leadsQualificados * proportionFactor),
+      mqls: Math.round(MONTHLY_GOALS.mqls * proportionFactor),
+      sqls: Math.round(MONTHLY_GOALS.sqls * proportionFactor),
+      agenda: Math.round(MONTHLY_GOALS.agenda * proportionFactor),
+      shows: Math.round(MONTHLY_GOALS.shows * proportionFactor),
+      venda: Math.round(MONTHLY_GOALS.venda * proportionFactor),
+      mrr: Math.round(MONTHLY_GOALS.mrr * proportionFactor),
+    };
+  };
+
+  const proportionalGoals = calculateProportionalGoals();
 
   const [expandedMetric, setExpandedMetric] = useState<{ type: MetricType; title: string } | null>({ type: 'mrr', title: 'MRR' });
   const [conversionMode, setConversionMode] = useState<'phase-to-phase' | 'funnel'>('phase-to-phase');
@@ -201,7 +272,9 @@ export const Marketing: React.FC = () => {
             title="Downloads"
             value={currentMetrics.downloads}
             previousValue={appliedFilters.compareWithPrevious && previousMetrics ? previousMetrics.downloads : undefined}
+            targetValue={appliedFilters.compareWithGoal ? proportionalGoals.downloads : undefined}
             isComparison={appliedFilters.compareWithPrevious}
+            isCompareWithGoal={appliedFilters.compareWithGoal}
             isExpanded={expandedMetric?.type === 'downloads'}
             icon={<Download size={20} className="text-primary" />}
             onExpand={() => setExpandedMetric(expandedMetric?.type === 'downloads' ? null : { type: 'downloads', title: 'Downloads' })}
@@ -210,7 +283,9 @@ export const Marketing: React.FC = () => {
             title="Leads"
             value={currentMetrics.leads}
             previousValue={appliedFilters.compareWithPrevious && previousMetrics ? previousMetrics.leads : undefined}
+            targetValue={appliedFilters.compareWithGoal ? proportionalGoals.leads : undefined}
             isComparison={appliedFilters.compareWithPrevious}
+            isCompareWithGoal={appliedFilters.compareWithGoal}
             isExpanded={expandedMetric?.type === 'leads'}
             icon={<Users size={20} className="text-primary" />}
             onExpand={() => setExpandedMetric(expandedMetric?.type === 'leads' ? null : { type: 'leads', title: 'Leads' })}
@@ -219,7 +294,9 @@ export const Marketing: React.FC = () => {
             title="Qualificados"
             value={currentMetrics.leadsQualificados}
             previousValue={appliedFilters.compareWithPrevious && previousMetrics ? previousMetrics.leadsQualificados : undefined}
+            targetValue={appliedFilters.compareWithGoal ? proportionalGoals.leadsQualificados : undefined}
             isComparison={appliedFilters.compareWithPrevious}
+            isCompareWithGoal={appliedFilters.compareWithGoal}
             isExpanded={expandedMetric?.type === 'leadsQualificados'}
             icon={<UserCheck size={20} className="text-primary" />}
             onExpand={() => setExpandedMetric(expandedMetric?.type === 'leadsQualificados' ? null : { type: 'leadsQualificados', title: 'Qualificados' })}
@@ -228,7 +305,9 @@ export const Marketing: React.FC = () => {
             title="MQLs"
             value={currentMetrics.mqls}
             previousValue={appliedFilters.compareWithPrevious && previousMetrics ? previousMetrics.mqls : undefined}
+            targetValue={appliedFilters.compareWithGoal ? proportionalGoals.mqls : undefined}
             isComparison={appliedFilters.compareWithPrevious}
+            isCompareWithGoal={appliedFilters.compareWithGoal}
             isExpanded={expandedMetric?.type === 'mqls'}
             icon={<Target size={20} className="text-primary" />}
             onExpand={() => setExpandedMetric(expandedMetric?.type === 'mqls' ? null : { type: 'mqls', title: 'MQLs' })}
@@ -237,7 +316,9 @@ export const Marketing: React.FC = () => {
             title="SQLs"
             value={currentMetrics.sqls}
             previousValue={appliedFilters.compareWithPrevious && previousMetrics ? previousMetrics.sqls : undefined}
+            targetValue={appliedFilters.compareWithGoal ? proportionalGoals.sqls : undefined}
             isComparison={appliedFilters.compareWithPrevious}
+            isCompareWithGoal={appliedFilters.compareWithGoal}
             isExpanded={expandedMetric?.type === 'sqls'}
             icon={<CheckCircle size={20} className="text-primary" />}
             onExpand={() => setExpandedMetric(expandedMetric?.type === 'sqls' ? null : { type: 'sqls', title: 'SQLs' })}
@@ -246,7 +327,9 @@ export const Marketing: React.FC = () => {
             title="Agenda"
             value={currentMetrics.agenda}
             previousValue={appliedFilters.compareWithPrevious && previousMetrics ? previousMetrics.agenda : undefined}
+            targetValue={appliedFilters.compareWithGoal ? proportionalGoals.agenda : undefined}
             isComparison={appliedFilters.compareWithPrevious}
+            isCompareWithGoal={appliedFilters.compareWithGoal}
             isExpanded={expandedMetric?.type === 'agenda'}
             icon={<Calendar size={20} className="text-primary" />}
             onExpand={() => setExpandedMetric(expandedMetric?.type === 'agenda' ? null : { type: 'agenda', title: 'Agenda' })}
@@ -255,7 +338,9 @@ export const Marketing: React.FC = () => {
             title="Shows"
             value={currentMetrics.shows}
             previousValue={appliedFilters.compareWithPrevious && previousMetrics ? previousMetrics.shows : undefined}
+            targetValue={appliedFilters.compareWithGoal ? proportionalGoals.shows : undefined}
             isComparison={appliedFilters.compareWithPrevious}
+            isCompareWithGoal={appliedFilters.compareWithGoal}
             isExpanded={expandedMetric?.type === 'shows'}
             icon={<Presentation size={20} className="text-primary" />}
             onExpand={() => setExpandedMetric(expandedMetric?.type === 'shows' ? null : { type: 'shows', title: 'Shows' })}
@@ -264,7 +349,9 @@ export const Marketing: React.FC = () => {
             title="Venda"
             value={currentMetrics.venda}
             previousValue={appliedFilters.compareWithPrevious && previousMetrics ? previousMetrics.venda : undefined}
+            targetValue={appliedFilters.compareWithGoal ? proportionalGoals.venda : undefined}
             isComparison={appliedFilters.compareWithPrevious}
+            isCompareWithGoal={appliedFilters.compareWithGoal}
             isExpanded={expandedMetric?.type === 'venda'}
             icon={<ShoppingCart size={20} className="text-primary" />}
             onExpand={() => setExpandedMetric(expandedMetric?.type === 'venda' ? null : { type: 'venda', title: 'Venda' })}
@@ -273,7 +360,9 @@ export const Marketing: React.FC = () => {
             title="MRR"
             value={currentMetrics.mrr}
             previousValue={appliedFilters.compareWithPrevious && previousMetrics ? previousMetrics.mrr : undefined}
+            targetValue={appliedFilters.compareWithGoal ? proportionalGoals.mrr : undefined}
             isComparison={appliedFilters.compareWithPrevious}
+            isCompareWithGoal={appliedFilters.compareWithGoal}
             isExpanded={expandedMetric?.type === 'mrr'}
             isCurrency={true}
             icon={<DollarSign size={20} className="text-primary" />}
@@ -290,6 +379,7 @@ export const Marketing: React.FC = () => {
           onClose={() => setExpandedMetric(null)}
           channels={appliedFilters.channels}
           origins={appliedFilters.origins}
+          monthlyGoal={MONTHLY_GOALS[expandedMetric.type]}
         />
       )}
 

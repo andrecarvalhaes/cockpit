@@ -8,6 +8,7 @@ export interface MarketingFiltersState {
   dateStart: string;
   dateEnd: string;
   compareWithPrevious: boolean;
+  compareWithGoal: boolean;
   channels: string[];
   origins: string[];
 }
@@ -84,10 +85,11 @@ export const MarketingFilters: React.FC<MarketingFiltersProps> = ({
     });
   };
 
-  const handleCompareToggle = (checked: boolean) => {
+  const handleComparisonChange = (mode: 'none' | 'previous' | 'goal') => {
     onFiltersChange({
       ...filters,
-      compareWithPrevious: checked,
+      compareWithPrevious: mode === 'previous',
+      compareWithGoal: mode === 'goal',
     });
   };
 
@@ -176,26 +178,41 @@ export const MarketingFilters: React.FC<MarketingFiltersProps> = ({
           />
         </div>
 
-        {/* Toggle Comparar com Período Anterior */}
+        {/* Opções de Comparação */}
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium text-text-primary">
             Opções
           </label>
-          <div className="flex items-center gap-3 px-4 py-3 bg-white border border-border rounded-lg h-[42px]">
-            <label className="flex items-center gap-3 cursor-pointer flex-1">
-              <div className="relative">
-                <input
-                  type="checkbox"
-                  checked={filters.compareWithPrevious}
-                  onChange={(e) => handleCompareToggle(e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-neutral rounded-full peer peer-checked:bg-primary transition-colors"></div>
-                <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-5"></div>
-              </div>
-              <span className="text-sm font-medium text-text-primary">
-                Comparar período anterior
-              </span>
+          <div className="flex flex-col gap-2 px-4 py-3 bg-white border border-border rounded-lg">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="comparison"
+                checked={!filters.compareWithPrevious && !filters.compareWithGoal}
+                onChange={() => handleComparisonChange('none')}
+                className="w-4 h-4 text-primary focus:ring-primary"
+              />
+              <span className="text-sm text-text-primary">Sem comparação</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="comparison"
+                checked={filters.compareWithPrevious}
+                onChange={() => handleComparisonChange('previous')}
+                className="w-4 h-4 text-primary focus:ring-primary"
+              />
+              <span className="text-sm text-text-primary">Comparar com período anterior</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="comparison"
+                checked={filters.compareWithGoal}
+                onChange={() => handleComparisonChange('goal')}
+                className="w-4 h-4 text-primary focus:ring-primary"
+              />
+              <span className="text-sm text-text-primary">Comparar com a meta</span>
             </label>
           </div>
         </div>
