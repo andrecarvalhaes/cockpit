@@ -24,6 +24,7 @@ interface UseOperadorTimeBreakdownProps {
   dateStart: string;
   dateEnd: string;
   granularity: TimeGranularity;
+  campanhas?: string[];
 }
 
 export const useOperadorTimeBreakdown = ({
@@ -31,6 +32,7 @@ export const useOperadorTimeBreakdown = ({
   dateStart,
   dateEnd,
   granularity,
+  campanhas,
 }: UseOperadorTimeBreakdownProps) => {
   const [periodMetrics, setPeriodMetrics] = useState<TimePeriodMetrics[]>([]);
   const [loading, setLoading] = useState(true);
@@ -123,6 +125,11 @@ export const useOperadorTimeBreakdown = ({
       query = query.eq('operador', operador);
     }
 
+    // Aplicar filtro de campanhas se fornecido
+    if (campanhas && campanhas.length > 0) {
+      query = query.in('campanha', campanhas);
+    }
+
     const { data, error: queryError } = await query;
 
     if (queryError) throw queryError;
@@ -176,7 +183,7 @@ export const useOperadorTimeBreakdown = ({
     if (operador && dateStart && dateEnd) {
       fetchData();
     }
-  }, [operador, dateStart, dateEnd, granularity]);
+  }, [operador, dateStart, dateEnd, granularity, JSON.stringify(campanhas)]);
 
   return {
     periodMetrics,

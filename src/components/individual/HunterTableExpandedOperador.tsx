@@ -13,6 +13,7 @@ interface HunterTableExpandedOperadorProps {
   onClose: () => void;
   hideWeekends: boolean;
   hideZeroCalls: boolean;
+  campanhas?: string[];
 }
 
 const granularityOptions: Array<{ value: TimeGranularity; label: string }> = [
@@ -31,6 +32,7 @@ export const HunterTableExpandedOperador: React.FC<HunterTableExpandedOperadorPr
   onClose,
   hideWeekends,
   hideZeroCalls,
+  campanhas,
 }) => {
   const [granularity, setGranularity] = useState<TimeGranularity>('week');
   const [expandedMetric, setExpandedMetric] = useState<string | null>(null);
@@ -40,6 +42,7 @@ export const HunterTableExpandedOperador: React.FC<HunterTableExpandedOperadorPr
     dateStart,
     dateEnd,
     granularity,
+    campanhas,
   });
 
   // Filtrar períodos baseado nas opções avançadas

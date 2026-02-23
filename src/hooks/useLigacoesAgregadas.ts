@@ -177,8 +177,7 @@ export const useCampanhasAgregadas = () => {
       const { data } = await supabase
         .from('mv_hunter_metrics')
         .select('campanha')
-        .not('campanha', 'is', null)
-        .neq('campanha', 'manual');
+        .not('campanha', 'is', null);
 
       const uniqueCampanhas = [...new Set(data?.map(d => d.campanha) || [])].sort();
       setCampanhas(uniqueCampanhas);

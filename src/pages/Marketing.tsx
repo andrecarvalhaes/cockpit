@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { MarketingFilters, MarketingFiltersState } from '../components/individual/MarketingFilters';
 import { MarketingMetricExpandedChart } from '../components/individual/MarketingMetricExpandedChart';
+import { MarketingFunnelPerformanceTable } from '../components/individual/MarketingFunnelPerformanceTable';
+import { CohortAnalysisTable } from '../components/individual/CohortAnalysisTable';
 import { useMarketingMetrics } from '../hooks/useMarketingMetrics';
-import { format, startOfMonth, endOfMonth } from 'date-fns';
+import { useMarketingFunnelPerformance } from '../hooks/useMarketingFunnelPerformance';
+import { useCohortAnalysis } from '../hooks/useCohortAnalysis';
+import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import { Download, Users, UserCheck, Target, TrendingUp, TrendingDown, Maximize2, Minimize2, CheckCircle, Calendar, Presentation, ShoppingCart, DollarSign } from 'lucide-react';
 
 type MetricType = 'downloads' | 'leads' | 'leadsQualificados' | 'mqls' | 'sqls' | 'agenda' | 'shows' | 'venda' | 'mrr';
@@ -124,6 +128,8 @@ export const Marketing: React.FC = () => {
   });
 
   const [expandedMetric, setExpandedMetric] = useState<{ type: MetricType; title: string } | null>({ type: 'mrr', title: 'MRR' });
+  const [conversionMode, setConversionMode] = useState<'phase-to-phase' | 'funnel'>('phase-to-phase');
+  const [cohortConversionMode, setCohortConversionMode] = useState<'phase-to-phase' | 'funnel'>('phase-to-phase');
 
   const handleApplyFilters = () => {
     setAppliedFilters(filters);
@@ -136,6 +142,23 @@ export const Marketing: React.FC = () => {
     compareWithPrevious: appliedFilters.compareWithPrevious,
     channels: appliedFilters.channels,
     origins: appliedFilters.origins,
+  });
+
+  // Buscar dados mensais para tabela de performance (sempre últimos 12 meses)
+  const last12MonthsStart = format(startOfMonth(subMonths(new Date(), 11)), 'yyyy-MM-dd');
+  const last12MonthsEnd = format(endOfMonth(new Date()), 'yyyy-MM-dd');
+
+  const { monthlyData, loading: loadingPerformance, error: errorPerformance } = useMarketingFunnelPerformance({
+    dateStart: last12MonthsStart,
+    dateEnd: last12MonthsEnd,
+    channels: appliedFilters.channels,
+    origins: appliedFilters.origins,
+  });
+
+  // Buscar dados de análise de safra (últimos 12 meses)
+  const { monthlyData: cohortData, loading: loadingCohort, error: errorCohort } = useCohortAnalysis({
+    dateStart: last12MonthsStart,
+    dateEnd: last12MonthsEnd,
   });
 
   return (
@@ -268,6 +291,56 @@ export const Marketing: React.FC = () => {
           channels={appliedFilters.channels}
           origins={appliedFilters.origins}
         />
+      )}
+
+      {/* Tabela de Performance do Funil */}
+      {!loading && !error && (
+        <>
+          {loadingPerformance && (
+            <div className="bg-white rounded-lg border border-border p-8 text-center">
+              <p className="text-text-secondary">Carregando dados de performance...</p>
+            </div>
+          )}
+
+          {errorPerformance && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-red-600 font-medium">{errorPerformance}</p>
+            </div>
+          )}
+
+          {!loadingPerformance && !errorPerformance && (
+            <MarketingFunnelPerformanceTable
+              monthlyData={monthlyData}
+              conversionMode={conversionMode}
+              onConversionModeChange={setConversionMode}
+            />
+          )}
+        </>
+      )}
+
+      {/* Análise de Safra */}
+      {!loading && !error && (
+        <>
+          {loadingCohort && (
+            <div className="bg-white rounded-lg border border-border p-8 text-center">
+              <p className="text-text-secondary">Carregando análise de safra...</p>
+            </div>
+          )}
+
+          {errorCohort && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-red-600 font-medium">{errorCohort}</p>
+            </div>
+          )}
+
+          {!loadingCohort && !errorCohort && (
+            <CohortAnalysisTable
+              monthlyData={cohortData}
+              conversionMode={cohortConversionMode}
+              onConversionModeChange={setCohortConversionMode}
+            />
+          )}
+        </>
       )}
 
     </div>
