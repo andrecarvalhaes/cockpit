@@ -26,10 +26,31 @@ interface MetricChartProps {
   metric: Metric;
   height?: number;
   chartType?: ChartType;
+  startMonth?: string; // Format: YYYY-MM
+  endMonth?: string;   // Format: YYYY-MM
 }
 
-export const MetricChart: React.FC<MetricChartProps> = ({ metric, height = 300, chartType = 'line' }) => {
-  const chartData = metric.values
+export const MetricChart: React.FC<MetricChartProps> = ({
+  metric,
+  height = 300,
+  chartType = 'line',
+  startMonth,
+  endMonth
+}) => {
+  // Filter values by month range if provided
+  let filteredValues = metric.values;
+  if (startMonth || endMonth) {
+    filteredValues = metric.values.filter((value) => {
+      const valueDate = new Date(value.date);
+      const valueMonth = format(valueDate, 'yyyy-MM');
+
+      if (startMonth && valueMonth < startMonth) return false;
+      if (endMonth && valueMonth > endMonth) return false;
+      return true;
+    });
+  }
+
+  const chartData = filteredValues
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .map((value) => ({
       date: format(new Date(value.date), 'MM/yy', { locale: ptBR }),
@@ -73,10 +94,26 @@ export const MetricChart: React.FC<MetricChartProps> = ({ metric, height = 300, 
     return null;
   };
 
+  const CustomLabel = (props: any) => {
+    const { x, y, value } = props;
+    return (
+      <text
+        x={x}
+        y={y - 10}
+        fill="#1A202C"
+        textAnchor="middle"
+        fontSize={11}
+        fontWeight={600}
+      >
+        {formatMetricValue(value, metric.unit)}
+      </text>
+    );
+  };
+
   if (chartType === 'line') {
     return (
       <ResponsiveContainer width="100%" height={height}>
-        <LineChart data={chartData}>
+        <LineChart data={chartData} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#E0E0E0" />
           <XAxis dataKey="date" stroke="#718096" style={{ fontSize: '12px' }} />
           <YAxis stroke="#718096" style={{ fontSize: '12px' }} domain={yAxisDomain} />
@@ -98,6 +135,7 @@ export const MetricChart: React.FC<MetricChartProps> = ({ metric, height = 300, 
             dot={{ fill: '#F26600', r: 4 }}
             activeDot={{ r: 6 }}
             name="Valor"
+            label={<CustomLabel />}
           />
         </LineChart>
       </ResponsiveContainer>
@@ -112,7 +150,7 @@ export const MetricChart: React.FC<MetricChartProps> = ({ metric, height = 300, 
 
     return (
       <ResponsiveContainer width="100%" height={height}>
-        <ComposedChart data={chartData}>
+        <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#E0E0E0" />
           <XAxis dataKey="date" stroke="#718096" style={{ fontSize: '12px' }} />
           <YAxis stroke="#718096" style={{ fontSize: '12px' }} domain={yAxisDomain} />
@@ -132,6 +170,7 @@ export const MetricChart: React.FC<MetricChartProps> = ({ metric, height = 300, 
             fillOpacity={0.2}
             strokeWidth={2}
             name="Valor"
+            label={<CustomLabel />}
           />
         </ComposedChart>
       </ResponsiveContainer>
@@ -146,7 +185,7 @@ export const MetricChart: React.FC<MetricChartProps> = ({ metric, height = 300, 
 
     return (
       <ResponsiveContainer width="100%" height={height}>
-        <ComposedChart data={chartData}>
+        <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#E0E0E0" />
           <XAxis dataKey="date" stroke="#718096" style={{ fontSize: '12px' }} />
           <YAxis stroke="#718096" style={{ fontSize: '12px' }} domain={yAxisDomain} />
@@ -158,7 +197,7 @@ export const MetricChart: React.FC<MetricChartProps> = ({ metric, height = 300, 
             strokeDasharray="5 5"
             label={{ value: 'Meta', position: 'right', fill: '#48C74C', fontSize: 12 }}
           />
-          <Bar dataKey="value" fill="#F26600" radius={[8, 8, 0, 0]} name="Valor" />
+          <Bar dataKey="value" fill="#F26600" radius={[8, 8, 0, 0]} name="Valor" label={<CustomLabel />} />
         </ComposedChart>
       </ResponsiveContainer>
     );

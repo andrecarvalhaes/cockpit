@@ -7,7 +7,6 @@ import { MetricCard } from '../components/metrics/MetricCard';
 import { MetricList } from '../components/metrics/MetricList';
 import { Modal } from '../components/shared/Modal';
 import { MetricForm } from '../components/metrics/MetricForm';
-import { PresentationMode } from '../components/metrics/PresentationMode';
 import { CommentModal } from '../components/metrics/CommentModal';
 import { AnalysisNotesModal } from '../components/metrics/AnalysisNotesModal';
 import { WarRoomModal } from '../components/metrics/WarRoomModal';
@@ -19,8 +18,7 @@ import { ActionPlanFormData } from '../types/actionPlan';
 
 export const MetricsByArea: React.FC = () => {
   const { area } = useParams<{ area: string }>();
-  const navigate = useNavigate();
-  const { metrics, addMetric, addMetricValue } = useMetrics();
+  const { metrics, addMetricValue } = useMetrics();
   const { addActionPlan } = useActionPlans();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,19 +31,6 @@ export const MetricsByArea: React.FC = () => {
 
   const filteredMetrics = metrics.filter((metric) => metric.area === area);
 
-  const handleCreateMetric = (data: MetricFormData) => {
-    addMetric({
-      ...data,
-      area: area as MetricArea,
-    });
-    setIsModalOpen(false);
-  };
-
-  const handleOpenComment = (metric: Metric) => {
-    setSelectedMetric(metric);
-    setIsCommentModalOpen(true);
-  };
-
   const handleSaveComment = (comment: string) => {
     if (selectedMetric) {
       // Adiciona comentário como nota no último valor ou cria um novo valor
@@ -55,11 +40,6 @@ export const MetricsByArea: React.FC = () => {
         note: comment,
       });
     }
-  };
-
-  const handleOpenActionPlan = (metric: Metric) => {
-    setSelectedMetric(metric);
-    setIsActionPlanModalOpen(true);
   };
 
   const handleCreateActionPlan = (data: ActionPlanFormData) => {
@@ -145,7 +125,6 @@ export const MetricsByArea: React.FC = () => {
                 <MetricCard
                   key={metric.id}
                   metric={metric}
-                  onClick={() => navigate(`/metrics/${metric.id}`)}
                 />
               ))}
             </div>
@@ -174,8 +153,8 @@ export const MetricsByArea: React.FC = () => {
         size="lg"
       >
         <MetricForm
-          onSubmit={handleCreateMetric}
-          onCancel={() => setIsModalOpen(false)}
+          onClose={() => setIsModalOpen(false)}
+          initialArea={area as MetricArea}
         />
       </Modal>
 

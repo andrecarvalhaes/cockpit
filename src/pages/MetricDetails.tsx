@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Trash2, Edit, TrendingUp, TrendingDown } from 'lucide-react';
+import { format, subMonths } from 'date-fns';
 import { Header } from '../components/layout/Header';
 import { Button } from '../components/shared/Button';
 import { Card } from '../components/shared/Card';
@@ -10,6 +11,7 @@ import { MetricValueForm } from '../components/metrics/MetricValueForm';
 import { MetricForm } from '../components/metrics/MetricForm';
 import { ActionPlanForm } from '../components/action-plans/ActionPlanForm';
 import { ActionPlanCard } from '../components/action-plans/ActionPlanCard';
+import { MonthRangePicker } from '../components/shared/MonthRangePicker';
 import { useMetrics } from '../hooks/useMetrics';
 import { useActionPlans } from '../hooks/useActionPlans';
 import { formatMetricValue, formatDate } from '../utils/formatters';
@@ -32,6 +34,10 @@ export const MetricDetails: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isActionPlanModalOpen, setIsActionPlanModalOpen] = useState(false);
   const [selectedChartType, setSelectedChartType] = useState<ChartType>('line');
+
+  // Default to last 6 months
+  const [startMonth, setStartMonth] = useState(format(subMonths(new Date(), 5), 'yyyy-MM'));
+  const [endMonth, setEndMonth] = useState(format(new Date(), 'yyyy-MM'));
 
   if (!metric) {
     return (
@@ -152,11 +158,22 @@ export const MetricDetails: React.FC = () => {
           </Card>
         </div>
 
+        {/* Filtro de Período */}
+        <Card className="mb-6">
+          <MonthRangePicker
+            label="Período do gráfico:"
+            startMonth={startMonth}
+            endMonth={endMonth}
+            onStartMonthChange={setStartMonth}
+            onEndMonthChange={setEndMonth}
+          />
+        </Card>
+
         {/* Gráfico */}
         <Card className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-heading font-bold text-text-primary">
-              Evolução da Métrica
+              {metric.name}
             </h3>
             <div className="flex gap-2">
               <Button
@@ -179,7 +196,13 @@ export const MetricDetails: React.FC = () => {
               </Button>
             </div>
           </div>
-          <MetricChart metric={metric} height={400} chartType={selectedChartType} />
+          <MetricChart
+            metric={metric}
+            height={400}
+            chartType={selectedChartType}
+            startMonth={startMonth}
+            endMonth={endMonth}
+          />
         </Card>
 
         {/* Histórico de Valores */}

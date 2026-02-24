@@ -4,7 +4,6 @@ import { Plus, TrendingUp, Users, LayoutGrid, List, StickyNote } from 'lucide-re
 import { MetricCard } from '../components/metrics/MetricCard';
 import { MetricList } from '../components/metrics/MetricList';
 import { MetricForm } from '../components/metrics/MetricForm';
-import { PresentationMode } from '../components/metrics/PresentationMode';
 import { CommentModal } from '../components/metrics/CommentModal';
 import { AnalysisNotesModal } from '../components/metrics/AnalysisNotesModal';
 import { WarRoomModal } from '../components/metrics/WarRoomModal';
@@ -36,11 +35,6 @@ export const MetricsByTeamAndArea: React.FC = () => {
     (m) => m.teamId === teamId && m.area === area
   );
 
-  const handleOpenComment = (metric: Metric) => {
-    setSelectedMetric(metric);
-    setIsCommentModalOpen(true);
-  };
-
   const handleSaveComment = (comment: string) => {
     if (selectedMetric) {
       addMetricValue(selectedMetric.id, {
@@ -49,11 +43,6 @@ export const MetricsByTeamAndArea: React.FC = () => {
         note: comment,
       });
     }
-  };
-
-  const handleOpenActionPlan = (metric: Metric) => {
-    setSelectedMetric(metric);
-    setIsActionPlanModalOpen(true);
   };
 
   const handleCreateActionPlan = (data: ActionPlanFormData) => {
@@ -144,7 +133,8 @@ export const MetricsByTeamAndArea: React.FC = () => {
             <Plus size={20} className="mr-2" />
             Novo Plano de Ação
           </Button>
-          <Button onClick={() => setIsFormOpen(true)} icon={Plus}>
+          <Button onClick={() => setIsFormOpen(true)}>
+            <Plus size={20} className="mr-2" />
             Nova Métrica
           </Button>
         </div>
@@ -160,7 +150,8 @@ export const MetricsByTeamAndArea: React.FC = () => {
           <p className="text-text-secondary mb-6">
             Comece criando uma nova métrica para {team.name} - {area}
           </p>
-          <Button onClick={() => setIsFormOpen(true)} icon={Plus}>
+          <Button onClick={() => setIsFormOpen(true)}>
+            <Plus size={20} className="mr-2" />
             Criar Primeira Métrica
           </Button>
         </div>
